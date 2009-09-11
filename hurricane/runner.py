@@ -28,7 +28,7 @@ class ApplicationManager(object):
         for consumer in settings.CONSUMERS:
             ConsumerClass = import_module(consumer + '.Consumer')
             recv_queue = multiprocessing.Queue()
-            consumer = ConsumerClass(settings, recv_quee)
+            consumer = ConsumerClass(settings, recv_queue)
             self.receiever_queues.append(recv_queue)
             multiprocessing.Process(target=consumer.run).start()
         
