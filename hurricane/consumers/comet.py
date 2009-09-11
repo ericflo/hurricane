@@ -1,7 +1,8 @@
 import simplejson
 import uuid
+import threading
 
-from Queue import Queue
+from Queue import Queue, Empty
 
 from hurricane.base import BaseConsumer
 
@@ -19,15 +20,24 @@ class Consumer(BaseConsumer):
         self.requests = Queue(0)
         self.server = HTTPServer(self.handle_request)
         self.server.listen(self.settings.COMET_PORT)
-        IOLoop.instance().start()
+        self.thread = threading.Thread(target=IOLoop.instance().start).start()
     
     def handle_request(self, request):
         self.requests.put(request)
     
+    def shutdown(self):
+        print 'Shutting Down'
+        IOLoop.instance().stop()
+    
     def message(self, msg):
         msg = msg._asdict()
+        dt = msg.pop('timestamp')
+        epoch = int(dt.strftime('%s'))
+        usec = dt.microsecond
+        timestamp = epoch + (usec / 1000000.0)
         msg.update({
             'id': str(uuid.uuid4()),
+            'timestamp': timestamp,
             # TODO: Figure out what else we need to add to these messages
         })
         json = simplejson.dumps(msg)
@@ -35,7 +45,7 @@ class Consumer(BaseConsumer):
         while True:
             try:
                 request = self.requests.get()
-            except Queue.Empty:
+            except Empty:
                 return
             request.write(response)
             request.finish()
