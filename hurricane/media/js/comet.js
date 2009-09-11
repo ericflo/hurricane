@@ -38,7 +38,8 @@ var Hurricane = (function() {
                 url: this.url,
                 type: 'POST',
                 dataType: 'text',
-                data: args, success: function(response) {
+                data: args,
+                success: function(response) {
                     hurricane.on_success(response);
                 },
                 error: function(response) { 
