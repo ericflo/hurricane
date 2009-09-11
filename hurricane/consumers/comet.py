@@ -40,7 +40,7 @@ class Consumer(BaseConsumer):
             'SCRIPT_NAME':  request.path,
             'PATH_INFO': request.path,
             'QUERY_STRING': request.query,
-            'CONTENT_TYPE': request.headers['Content-Type'],
+            'CONTENT_TYPE': request.headers.get('Content-Type'),
             'CONTENT_LENGTH': request.headers['Content-Length'],
             'SERVER_NAME': request.host,
             'SERVER_PORT': self.settings.COMET_PORT,
