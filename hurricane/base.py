@@ -1,7 +1,5 @@
 import Queue
 
-from collections import namedtuple
-
 from hurricane.utils import run_until_stopped
 
 class PubSubBase(object):
