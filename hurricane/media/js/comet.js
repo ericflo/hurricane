@@ -39,7 +39,7 @@ var Hurricane = (function() {
             var args = $.param({'cursor': this.cursor});
             $.ajax({url: this.url, type: 'POST', dataType: 'text', data: args, success: this.on_success, error: this.on_error});
         }
-    }
+    };
 
     return new Hurricane();
 })();
