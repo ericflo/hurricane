@@ -5,7 +5,7 @@ import time
 
 from hurricane.base import PubSubBase, Message
 
-class RandomDataProducder(PubSubBase):
+class Producer(PubSubBase):
     def run(self):
         while True:
             msg = Message('random', datetime.now(), 
