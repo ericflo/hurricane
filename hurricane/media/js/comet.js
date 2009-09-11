@@ -5,6 +5,7 @@ var Hurricane = (function() {
         this.backoff_iteration = 1;
         this.url = '/comet/';
         this.ajax_request();
+        this.callbacks = {};
     };
 
     Hurricane.prototype = {
@@ -14,11 +15,9 @@ var Hurricane = (function() {
             for (var msg_idx in messages) {
                 /* TODO: Make this dispatch */
                 var msg = messages[msg_idx];
-                var json_msg = JSON.stringify(msg);
-                $('.items').prepend('<li>' + json_msg + '</li>');
-
-                if ($('.items li').length > 200) {
-                    $('.items li:last').remove();
+                var callback = this.callbacks[msg.kind];
+                if(callback) {
+                    callback(msg);
                 }
             }
             this.backoff_iteration = 1;
@@ -26,9 +25,10 @@ var Hurricane = (function() {
         },
 
         on_error: function(response) {
+            var hurricane = this;
             setTimeout(function() {
-                this.ajax_request();
-            }, this.backoff_iteration * this.initial_backoff);
+                hurricane.ajax_request();
+            }, hurricane.backoff_iteration * hurricane.initial_backoff);
         },
 
         ajax_request: function() {
@@ -46,6 +46,10 @@ var Hurricane = (function() {
                     hurricane.on_error(response);
                 }
             });
+        },
+        
+        add_callback: function(kind, callback) {
+            this.callbacks[kind] = callback;
         }
     };
     
