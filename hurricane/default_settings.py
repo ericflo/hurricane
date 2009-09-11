@@ -1,5 +1,5 @@
 CONSUMERS = (
-    'hurricane.consumers.logging',
+    'hurricane.consumers.printing',
 )
 
 PRODUCERS = (
