@@ -47,7 +47,7 @@ class Consumer(BaseConsumer):
                 f = open(path).read()
             except (OSError, IOError):
                 request.write(HttpResponse(404).as_bytes())
-                request.finalize()
+                request.finish()
                 return
         (content_type, encoding) = mimetypes.guess_type(path)
         length = len(f)
