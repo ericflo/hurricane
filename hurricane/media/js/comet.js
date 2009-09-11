@@ -4,7 +4,6 @@ $(function() {
     var on_success = function(response) {
         var messages = JSON.parse(response).messages;
         cursor = messages[messages.length-1].id;
-        /*ajax_request();*/
         for(var msg_idx in messages) {
             var msg = messages[msg_idx];
             var json_msg = JSON.stringify(msg);

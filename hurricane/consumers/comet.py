@@ -89,15 +89,15 @@ class Consumer(BaseConsumer):
                 request = self.requests.get(block=False)
             except Empty:
                 return
-            print request.arguments
             cursor = request.arguments.get('cursor', [None])[0]
             seen = False
             messages_to_send = []
             for msg in self.messages:
-                if not seen and msg['id'] == cursor:
-                    seen = True
                 if seen:
-                    messages_to_send.append(msg)                    
+                    messages_to_send.append(msg)
+                else:
+                    if msg['id'] == cursor:
+                        seen = True                 
             messages_to_send = messages_to_send or list(self.messages)
             json = simplejson.dumps({'messages': messages_to_send})
             response = json_http_response(json)
