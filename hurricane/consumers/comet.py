@@ -11,14 +11,8 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
 from hurricane.base import BaseConsumer
-from hurricane.utils import RingBuffer
+from hurricane.utils import RingBuffer, HttpResponse
 
-
-def json_http_response(json):
-    return 'HTTP/1.1 200 OK\r\nContent-Length: %d\r\nContent-Type: application/json\r\n\r\n%s' % (
-        len(json),
-        json
-    )
 
 class Consumer(BaseConsumer):
     def initialize(self):
@@ -52,18 +46,12 @@ class Consumer(BaseConsumer):
             try:
                 f = open(path).read()
             except (OSError, IOError):
-                request.write('HTTP/1.1 404 NOT FOUND')
+                request.write(HttpResponse(404).as_bytes())
                 request.finalize()
                 return
         (content_type, encoding) = mimetypes.guess_type(path)
-        if not content_type:
-            content_type = 'text/plain'
         length = len(f)
-        request.write('HTTP/1.1 200 OK\r\nContent-Length: %s\r\nContent-Type: %s\r\n\r\n%s' % (
-            length,
-            content_type,
-            f
-        ))
+        request.write(HttpResponse(200, content_type, f).as_bytes())
         request.finish()
 
     def shutdown(self):
@@ -100,6 +88,6 @@ class Consumer(BaseConsumer):
                         seen = True
             messages_to_send = messages_to_send or list(self.messages)
             json = simplejson.dumps({'messages': messages_to_send})
-            response = json_http_response(json)
-            request.write(response)
+            response = HttpResponse(200, 'application/json', json)
+            request.write(response.as_bytes())
             request.finish()
