@@ -25,7 +25,7 @@ class ApplicationManager(object):
         for producer in settings.PRODUCERS:
             ProducerClass = import_module(producer).Producer
             producer = ProducerClass(settings, self.producer_queue)
-            multiprocessing.Process(target=producer.run).start()
+            multiprocessing.Process(target=producer.run_base).start()
         
         self.receiver_queues = []
 
@@ -34,7 +34,7 @@ class ApplicationManager(object):
             recv_queue = multiprocessing.Queue()
             consumer = ConsumerClass(settings, recv_queue)
             self.receiver_queues.append(recv_queue)
-            multiprocessing.Process(target=consumer.run).start()
+            multiprocessing.Process(target=consumer.run_base).start()
         
         while True:
             item = self.producer_queue.get()
