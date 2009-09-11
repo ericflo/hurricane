@@ -22,7 +22,7 @@ class Consumer(BaseConsumer):
         IOLoop.instance().start()
     
     def handle_request(self, request):
-        self.requests.append(request)
+        self.requests.put(request)
     
     def message(self, msg):
         msg = msg._asdict()
