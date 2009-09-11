@@ -12,7 +12,7 @@ $(function() {
         var data = $('#message').val();
         $.ajax({
             url: '/comet/',
-            method: 'POST',
+            type: 'POST',
             data: JSON.stringify({'message': data})
         });
         return false;
