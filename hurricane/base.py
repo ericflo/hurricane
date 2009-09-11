@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 class PubSubBase(object):
     def __init__(self, settings, queue):
         self.settings = settings
@@ -5,3 +7,5 @@ class PubSubBase(object):
     
     def run(self):
         raise NotImplemented
+
+Message = namedtuple('Message', 'kind timestamp raw_data')
