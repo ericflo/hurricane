@@ -1,5 +1,6 @@
 import threading
 import uuid
+import mimetypes
 from Queue import Queue, Empty
 
 import simplejson
@@ -41,14 +42,17 @@ class Consumer(BaseConsumer):
         self.requests.put(request)
     
     def media_view(self, request):
+        path = safe_join(self.settings.MEDIA_ROOT, request.path[len('/media/'):])
         try:
-            f = open(safe_join(self.settings.MEDIA_ROOT, request.path[len('/media/'):])).read()
+            f = open(path).read()
         except OSError:
             request.write('HTTP/1.1 404 NOT FOUND')
             request.finalize()
             return
+        (content_type, encoding) = mimetypes.guess_type(path)
+        if not content_type:
+            content_type = 'text/plain'
         length = len(f)
-        content_type = 'text/plain'
         request.write('HTTP/1.1 200 OK\r\nContent-Length: %s\r\nContent-Type: %s\r\n\r\n%s' % (
             length,
             content_type,
