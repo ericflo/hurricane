@@ -6,7 +6,7 @@ var Hurricane = (function() {
         this.url = '/comet/';
         this.ajax_request();
     };
-    
+
     Hurricane.prototype = {
         on_success: function(response) {
             var messages = JSON.parse(response).messages;
@@ -16,7 +16,7 @@ var Hurricane = (function() {
                 var msg = messages[msg_idx];
                 var json_msg = JSON.stringify(msg);
                 $('.items').prepend('<li>' + json_msg + '</li>');
-                
+
                 if ($('.items li').length > 200) {
                     $('.items li:last').remove();
                 }
@@ -24,13 +24,13 @@ var Hurricane = (function() {
             this.backoff_iteration = 1;
             this.ajax_request();
         },
-        
+
         on_error: function(response) {
             setTimeout(function() {
                 this.ajax_request();
             }, this.backoff_iteration * this.initial_backoff);
         },
-        
+
         ajax_request: function() {
             var args = $.param({'cursor': this.cursor});
             var hurricane = this;
@@ -46,7 +46,7 @@ var Hurricane = (function() {
                 }
             });
         }
-    }
+    };
     
     return new Hurricane();
 })();
