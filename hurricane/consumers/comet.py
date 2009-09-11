@@ -28,21 +28,21 @@ class Consumer(BaseConsumer):
         self.thread = threading.Thread(target=IOLoop.instance().start).start()
         self.messages = RingBuffer(self.settings.COMET_CACHE_SIZE)
         self.urls = self.get_urls()
-    
+
     def get_urls(self):
         return (
             ('/media/', self.media_view),
             ('/comet/', self.comet_view),
-        ) 
-    
+        )
+
     def handle_request(self, request):
         for url, view in self.urls:
             if request.path.startswith(url):
                 return view(request)
-        
+
     def comet_view(self, request):
         self.requests.put(request)
-    
+
     def media_view(self, request):
         path = safe_join(self.settings.MEDIA_ROOT, request.path[len('/media/'):])
         try:
@@ -69,7 +69,7 @@ class Consumer(BaseConsumer):
     def shutdown(self):
         print 'Shutting Down'
         IOLoop.instance().stop()
-    
+
     def message(self, msg):
         msg = msg._asdict()
         dt = msg.pop('timestamp')
@@ -82,7 +82,7 @@ class Consumer(BaseConsumer):
         })
         self.messages.append(msg)
         self.respond_to_requests()
-    
+
     def respond_to_requests(self):
         while True:
             try:
@@ -97,7 +97,7 @@ class Consumer(BaseConsumer):
                     messages_to_send.append(msg)
                 else:
                     if msg['id'] == cursor:
-                        seen = True                 
+                        seen = True
             messages_to_send = messages_to_send or list(self.messages)
             json = simplejson.dumps({'messages': messages_to_send})
             response = json_http_response(json)
