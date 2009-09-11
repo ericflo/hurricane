@@ -13,11 +13,10 @@ class ApplicationManager(object):
     @run_until_stopped
     def run(self):
         parser = optparse.OptionParser()
-        parser.add_option('--settings', dest='settings')
+        parser.add_option('--settings', dest='settings',
+            default='hurricane.default_settings')
         
         options, args = parser.parse_args()
-        if not options.settings:
-            raise ImproperlyConfigured("You didn't provide a settings module.")
         settings = import_module(options.settings)
         django_settings.configure(settings)
         
