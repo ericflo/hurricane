@@ -3,9 +3,9 @@ import os
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 HANDLERS = (
-    'hurricane.consumers.printing',
-    'hurricane.consumers.comet',
-    'hurricane.producers.random_data',
+    'hurricane.handlers.printing',
+    'hurricane.handlers.comet',
+    'hurricane.handlers.random_data',
 )
 
 LOG_FILE = 'message-log.txt'
