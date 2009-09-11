@@ -6,19 +6,22 @@ var Hurricane = (function() {
         this.initial_backoff = 500;
         this.backoff_iteration = 1;
         this.url = '/comet/';
-        setTimeout(function(){ hurricane.ajax_request(); }, 50); /* Probably should have a better way to start the first request */
+        setTimeout(function() {
+            hurricane.ajax_request(); 
+        }, 50); /* Probably should have a better way to start the first request */
     };
     
     Hurricane.prototype = {
         on_success: function(response) {
             var messages = JSON.parse(response).messages;
             this.cursor = messages[messages.length-1].id;
-            for(var msg_idx in messages) {
+            for (var msg_idx in messages) {
                 /* TODO: Make this dispatch */
                 var msg = messages[msg_idx];
                 var json_msg = JSON.stringify(msg);
                 $('.items').prepend('<li>' + json_msg + '</li>');
-                if($('.items li').length > 200) {
+                
+                if ($('.items li').length > 200) {
                     $('.items li:last').remove();
                 }
             }
@@ -27,7 +30,9 @@ var Hurricane = (function() {
         },
         
         on_error: function(response) {
-            setTimeout(function(){ hurricane.ajax_request(); }, this.backoff_iteration * this.initial_backoff);
+            setTimeout(function() {
+                hurricane.ajax_request(); 
+            }, this.backoff_iteration * this.initial_backoff);
         },
         
         ajax_request: function() {
