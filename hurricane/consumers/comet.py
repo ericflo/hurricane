@@ -1,7 +1,7 @@
 import simplejson
 import uuid
 
-from queue import Queue
+from Queue import Queue
 
 from hurricane.base import BaseConsumer
 
