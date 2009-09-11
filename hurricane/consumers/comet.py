@@ -23,7 +23,8 @@ class Consumer(BaseConsumer):
         self.thread = threading.Thread(target=IOLoop.instance().start).start()
     
     def handle_request(self, request):
-        self.requests.put(request)
+        if request.uri == self.settings.COMET_URL:
+            self.requests.put(request)
     
     def shutdown(self):
         print 'Shutting Down'
