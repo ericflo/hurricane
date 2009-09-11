@@ -1,3 +1,4 @@
 pip-log.txt
 *.pyc
 *.wpr
+*local_settings.py
