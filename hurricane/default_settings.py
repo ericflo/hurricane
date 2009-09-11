@@ -1,7 +1,9 @@
-CONSUMERS = [
+CONSUMERS = (
+    'hurricane.consumers.logging',
+)
 
-]
+PRODUCERS = (
+    'hurricane.producers.random_data',
+)
 
-PRODUCERS = [
-
-]
+LOG_FILE = 'message-log.txt'
