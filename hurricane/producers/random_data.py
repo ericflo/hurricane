@@ -3,9 +3,9 @@ import random
 import string
 import time
 
-from hurricane.base import PubSubBase, Message
+from hurricane.base import BaseProducer, Message
 
-class Producer(PubSubBase):
+class Producer(BaseProducer):
     def run(self):
         while True:
             msg = Message('random', datetime.now(), 
