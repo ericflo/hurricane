@@ -57,9 +57,11 @@ $(function() {
         $('#ajax-loader').remove();
     }
     
-    var filters = [linkify, twitterfy, hashify];
-    
-    Hurricane.add_callback('random', function(msg) {
+    function callback(msg) {
+        var tweet = msg.raw_data;
+        if(!tweet.text) {
+            return;
+        }
         var body = escape_html(tweet.text);
         for (var i in filters) {
             body = filters[i].call(this, body);
@@ -70,12 +72,16 @@ $(function() {
             + tweet.user.screen_name + '</a>)</strong> ' + body
             + ' -- <a href="http://twitter.com/' + tweet.user.screen_name + '/status/' + tweet.id + '" target="_blank"><abbr class="timeago" title="' + tweet.iso8601 + '">' + tweet.iso8601 + '</abbr></a></div></li>',
             initial);
-        
-        var json_msg = JSON.stringify(msg);
-        $('.items').prepend('<li>' + json_msg + '</li>');
 
         if ($('.items li').length > 200) {
             $('.items li:last').remove();
         }
-    });
+        
+        initial = true;
+    }
+    
+    var filters = [linkify, twitterfy, hashify];
+    var initial = false;
+    
+    Hurricane.add_callback('tweet', callback);
 });
