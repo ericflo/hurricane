@@ -66,12 +66,15 @@ $(function() {
         for (var i in filters) {
             body = filters[i].call(this, body);
         }
-        add_item('<li class="new_item"><div class="line clearfix"><img src="' + tweet.user.profile_image_url
-            + '" width="40" height="40"></img> <strong>(by <a target="_blank" '
-            + 'href="http://twitter.com/' + tweet.user.screen_name + '">'
-            + tweet.user.screen_name + '</a>)</strong> ' + body
-            + ' -- <a href="http://twitter.com/' + tweet.user.screen_name + '/status/' + tweet.id + '" target="_blank"><abbr class="timeago" title="' + tweet.iso8601 + '">' + tweet.iso8601 + '</abbr></a></div></li>',
-            initial);
+        add_item('<li class="new_item"><div class="line clearfix"><img src="'
+            + tweet.user.profile_image_url + '" width="40" height="40"></img> '
+            + '<strong>(by <a target="_blank" href="http://twitter.com/'
+            + tweet.user.screen_name + '">' + tweet.user.screen_name + '</a>)'
+            + '</strong> ' + body + ' -- <a href="http://twitter.com/'
+            + tweet.user.screen_name + '/status/' + tweet.id
+            + '" target="_blank"><abbr class="timeago" title="' + tweet.iso8601
+            + '">' + tweet.iso8601 + '</abbr></a></div></li>', initial
+        );
 
         if ($('.items li').length > 200) {
             $('.items li:last').remove();
