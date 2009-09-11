@@ -41,7 +41,7 @@ class Handler(BaseConsumer):
 
     def comet_view(self, request):
         if request.method == 'POST':
-            self.out_queue.write(Message('comet', datetime.now(),
+            self.out_queue.put(Message('comet', datetime.now(),
                 simplejson.loads(request.body)))
         else:
             self.requests.put(request)
