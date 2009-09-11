@@ -1,13 +1,16 @@
-import simplejson
-import uuid
 import threading
-
+import uuid
 from Queue import Queue, Empty
 
-from hurricane.base import BaseConsumer
+import simplejson
+
+from django.utils._os import safe_join
 
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
+
+from hurricane.base import BaseConsumer
+
 
 def json_http_response(json):
     return 'HTTP/1.1 200 OK\r\nContent-Length: %d\r\nContent-Type: application/json\r\n\r\n%s' % (
@@ -24,7 +27,7 @@ class Consumer(BaseConsumer):
     
     def handle_request(self, request):
         urls = [
-            ('/comet/', self.comet_view),
+            ('/media/', self.media_view),
             ('/', self.wsgi_view),
         ]
         for url, view in urls:
@@ -34,27 +37,21 @@ class Consumer(BaseConsumer):
     def comet_view(self, request):
         self.requests.put(request)
     
-    def wsgi_view(self, request):
-        environ = {
-            'REQUEST_METHOD': request.method,
-            'SCRIPT_NAME':  request.path,
-            'PATH_INFO': request.path,
-            'QUERY_STRING': request.query,
-            'CONTENT_TYPE': request.headers.get('Content-Type'),
-            'CONTENT_LENGTH': request.headers['Content-Length'],
-            'SERVER_NAME': request.host,
-            'SERVER_PORT': self.settings.COMET_PORT,
-            'SERVER_PROTOCOL': 'HTTP/1.1',
-        }
-        def start_response(status, headers):
-            request.write('HTTP/1.1 %(status)s\r\n%(headers)s' % {
-                'status': status,
-                'headers': '\r\n'.join('%s: %s' % (k, v) for k, v in headers)
-            })
-        wsgi_app = import_module(self.settings.WSGI_CALLABLE).application
-        response = wsgi_app(environ, start_response)
-        request.write(''.join(response))
-        request.finalize()
+    def media_view(self, request):
+        try:
+            f = open(safe_join(self.settings.MEDIA_ROOT, request.path[len('/media/'):])).read()
+        except OSError:
+            request.write('HTTP/1.1 404 NOT FOUND')
+            request.finalize()
+            return
+        length = len(f)
+        content_type = 'text/plain'
+        self.write('HTTP/1.1 200 OK\r\nContent-Length: %s\r\nContent-Type: %s\r\n\r\n%s' % (
+            length,
+            content_type,
+            f
+        ))
+        self.finalize()
 
     def shutdown(self):
         print 'Shutting Down'
