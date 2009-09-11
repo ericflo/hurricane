@@ -2,7 +2,7 @@ $(function() {
     function escape_html(html) {
         return html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#39;');
     }
-    
+
     function linkify(msg) {
         var matches = msg.match(/https?:\/\/\S+/g);
         if (!matches) {
@@ -41,7 +41,7 @@ $(function() {
         }
         return msg;
     }
-    
+
     function add_item(html, initial) {
         $('.items').prepend(html);
         $('.new_item').each(function() {
@@ -56,10 +56,10 @@ $(function() {
         }
         $('#ajax-loader').remove();
     }
-    
+
     function callback(msg) {
         var tweet = msg.raw_data;
-        if(!tweet.text) {
+        if (!tweet.text) {
             return;
         }
         var body = escape_html(tweet.text);
@@ -76,12 +76,12 @@ $(function() {
         if ($('.items li').length > 200) {
             $('.items li:last').remove();
         }
-        
+
         initial = true;
     }
-    
+
     var filters = [linkify, twitterfy, hashify];
     var initial = false;
-    
+
     Hurricane.add_callback('tweet', callback);
 });
