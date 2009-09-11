@@ -1,14 +1,10 @@
 var Hurricane = (function() {
-    Hurricane = function() {
-        var hurricane = this;
-        
+    Hurricane = function() {        
         this.cursor = null;
         this.initial_backoff = 500;
         this.backoff_iteration = 1;
         this.url = '/comet/';
-        setTimeout(function() {
-            hurricane.ajax_request(); 
-        }, 50); /* Probably should have a better way to start the first request */
+        this.ajax_request();
     };
     
     Hurricane.prototype = {
@@ -31,14 +27,25 @@ var Hurricane = (function() {
         
         on_error: function(response) {
             setTimeout(function() {
-                hurricane.ajax_request(); 
+                this.ajax_request();
             }, this.backoff_iteration * this.initial_backoff);
         },
         
         ajax_request: function() {
             var args = $.param({'cursor': this.cursor});
-            $.ajax({url: this.url, type: 'POST', dataType: 'text', data: args, success: this.on_success, error: this.on_error});
-        },
+            var hurricane = this;
+            $.ajax({
+                url: this.url,
+                type: 'POST',
+                dataType: 'text',
+                data: args, success: function(response) {
+                    hurricane.on_success(response);
+                },
+                error: function(response) { 
+                    hurricane.on_error(response);
+                }
+            });
+        }
     }
     
     return new Hurricane();
