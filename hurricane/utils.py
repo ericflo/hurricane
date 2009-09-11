@@ -12,8 +12,6 @@ def run_until_stopped(func):
                 self.shutdown()
             except (IndexError, AttributeError):
                 pass
-            pass
-
     return wrapped
 
 class HttpResponse(object):

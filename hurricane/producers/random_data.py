@@ -6,11 +6,11 @@ import time
 from hurricane.base import BaseProducer, Message
 from hurricane.utils import run_until_stopped
 
-class Producer(BaseProducer):
+class Handler(BaseProducer):
     @run_until_stopped
     def run(self):
         while True:
-            msg = Message('random', datetime.now(), 
+            msg = Message('random', datetime.now(),
                 ''.join(random.sample(string.letters, 8)))
-            self.queue.put(msg)
+            self.out_queue.put(msg)
             time.sleep(1)

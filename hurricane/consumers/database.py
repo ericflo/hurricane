@@ -1,7 +1,7 @@
 from hurricane.models import Item
 from hurricane.base import BaseConsumer
 
-class Consumer(BaseConsumer):
+class Handler(BaseConsumer):
     def message(self, msg):
         Item.objects.create(
             kind=msg.kind,
