@@ -13,7 +13,7 @@ $(function() {
         $.ajax({
             url: '/comet/',
             method: 'POST',
-            data: data
+            data: JSON.stringify({'message': data})
         })
     });
 });
