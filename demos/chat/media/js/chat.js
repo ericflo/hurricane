@@ -9,11 +9,12 @@ $(function() {
     Hurricane.add_callback('chat', callback);
 
     $('#chat-input').submit(function () {
-        var data = $('#message').value()
+        var data = $('#message').value();
         $.ajax({
             url: '/comet/',
             method: 'POST',
             data: data
-        })
+        });
+        return false;
     });
 });
