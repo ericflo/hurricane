@@ -9,5 +9,4 @@ PRODUCERS = (
 
 LOG_FILE = 'message-log.txt'
 
-COMET_URL = '/comet/'
 COMET_PORT = 8000
