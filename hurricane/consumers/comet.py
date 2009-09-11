@@ -45,10 +45,14 @@ class Consumer(BaseConsumer):
         path = safe_join(self.settings.MEDIA_ROOT, request.path[len('/media/'):])
         try:
             f = open(path).read()
-        except OSError:
-            request.write('HTTP/1.1 404 NOT FOUND')
-            request.finalize()
-            return
+        except (OSError, IOError):
+            path = safe_join(path, 'index.html')
+            try:
+                f = open(path).read()
+            except (OSError, IOError):
+                request.write('HTTP/1.1 404 NOT FOUND')
+                request.finalize()
+                return
         (content_type, encoding) = mimetypes.guess_type(path)
         if not content_type:
             content_type = 'text/plain'
