@@ -15,6 +15,7 @@ $(function() {
             type: 'POST',
             data: JSON.stringify({'message': data, 'nick': nick})
         });
+        $('#message').val('');
         return false;
     });
 
