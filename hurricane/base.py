@@ -10,7 +10,7 @@ class PubSubBase(object):
     def run(self):
         raise NotImplemented
 
-class BaseConsumer(object):
+class BaseConsumer(PubSubBase):
     def run(self):
         while True:
             try:
@@ -22,7 +22,7 @@ class BaseConsumer(object):
     def message(self, msg):
         raise NotImplemented
 
-class BaseProducer(object):
+class BaseProducer(PubSubBase):
     pass
 
 Message = namedtuple('Message', 'kind timestamp raw_data')
