@@ -8,8 +8,7 @@ $(function() {
         ajax_request();
     };
     var on_error = function(response) {
-        alert(response);
-        ajax_request();
+        setTimeout(ajax_request, 500);
     };
     
     ajax_request();
