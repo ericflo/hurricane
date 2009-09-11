@@ -3,4 +3,5 @@ from hurricane.base import PubSubBase
 
 
 class Handler(PubSubBase):
-    pass
+    def run(self):
+        pass
