@@ -13,7 +13,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
 from hurricane.base import BaseConsumer, Message
-from hurricane.utils import RingBuffer, HttpResponse
+from hurricane.utils import RingBuffer, HttpResponse, message_after
 
 class Handler(BaseConsumer):
     def initialize(self):
@@ -43,9 +43,14 @@ class Handler(BaseConsumer):
         if request.method == 'POST':
             self.out_queue.put(Message('comet', datetime.now(),
                 simplejson.loads(request.body)))
+            request.write(HttpResponse(201).as_bytes())
             request.finish()
         else:
-            self.requests.put(request)
+            cursor = request.arguments.get('cursor', [None])[0]
+            if cursor == 'null' and len(self.messages) > 0:
+                self.respond_to_request(request)
+            else:
+                self.requests.put(request)
 
     def media_view(self, request, base_path, url_part):
         path = safe_join(base_path, request.path[len(url_part):])
@@ -82,26 +87,24 @@ class Handler(BaseConsumer):
         self.messages.append(msg)
         self.respond_to_requests()
 
+    def respond_to_request(self, request):
+        cursor = request.arguments.get('cursor', [None])[0]
+        messages_to_send = (
+            list(message_after(self.messages, lambda x: x['id'] == cursor))
+            or list(self.messages)
+        )
+        json = simplejson.dumps({'messages': messages_to_send})
+        response = HttpResponse(200, 'application/json', json)
+        try:
+            request.write(response.as_bytes())
+        except IOError:
+            return
+        request.finish()
+
     def respond_to_requests(self):
         while True:
             try:
                 request = self.requests.get(block=False)
             except Empty:
                 return
-            cursor = request.arguments.get('cursor', [None])[0]
-            seen = False
-            messages_to_send = []
-            for msg in self.messages:
-                if seen:
-                    messages_to_send.append(msg)
-                else:
-                    if msg['id'] == cursor:
-                        seen = True
-            messages_to_send = messages_to_send or list(self.messages)
-            json = simplejson.dumps({'messages': messages_to_send})
-            response = HttpResponse(200, 'application/json', json)
-            try:
-                request.write(response.as_bytes())
-            except IOError:
-                return
-            request.finish()
+            self.respond_to_request(request)

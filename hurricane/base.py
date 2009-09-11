@@ -46,3 +46,6 @@ class Message(object):
             'timestamp': self.timestamp,
             'raw_data': self.raw_data
         }
+    
+    def __str__(self):
+        return str(self._asdict())

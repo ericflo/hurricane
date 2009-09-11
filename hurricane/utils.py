@@ -1,5 +1,6 @@
 import collections
 from functools import wraps
+from itertools import islice
 
 def run_until_stopped(func):
     @wraps(func)
@@ -13,6 +14,15 @@ def run_until_stopped(func):
             except (IndexError, AttributeError):
                 pass
     return wrapped
+
+def message_after(it, func):
+    seen = False
+    for item in it:
+        if not seen:
+            if func(item):
+                seen = True
+        else:
+            yield item
 
 class HttpResponse(object):
     def __init__(self, status_code, content_type=None, body=''):

@@ -1,8 +1,7 @@
 var Hurricane = (function() {
     Hurricane = function() {        
         this.cursor = null;
-        this.initial_backoff = 500;
-        this.backoff_iteration = 1;
+        this.backoff = 500;
         this.url = '/comet/';
         this.ajax_request();
         this.callbacks = {};
@@ -19,7 +18,7 @@ var Hurricane = (function() {
                     callback(msg);
                 }
             }
-            this.backoff_iteration = 1;
+            this.backoff = 500;
             this.ajax_request();
         },
 
@@ -27,7 +26,8 @@ var Hurricane = (function() {
             var hurricane = this;
             setTimeout(function() {
                 hurricane.ajax_request();
-            }, hurricane.backoff_iteration * hurricane.initial_backoff);
+            }, hurricane.backoff);
+            this.backoff *= 2;
         },
 
         ajax_request: function() {
