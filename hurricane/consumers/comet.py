@@ -33,6 +33,8 @@ class Consumer(BaseConsumer):
         for url, view in self.urls:
             if request.path.startswith(url):
                 return view(request)
+        request.write(HttpResponse(404).as_bytes())
+        request.finish()
 
     def comet_view(self, request):
         self.requests.put(request)
