@@ -1,5 +1,5 @@
 from hurricane.base import BaseConsumer
 
-class Consumer(BaseConsumer):
+class Handler(BaseConsumer):
     def message(self, msg):
         print str(msg)

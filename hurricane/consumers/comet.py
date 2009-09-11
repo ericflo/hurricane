@@ -14,7 +14,7 @@ from hurricane.base import BaseConsumer
 from hurricane.utils import RingBuffer, HttpResponse
 
 
-class Consumer(BaseConsumer):
+class Handler(BaseConsumer):
     def initialize(self):
         self.requests = Queue(0)
         self.server = HTTPServer(self.handle_request)

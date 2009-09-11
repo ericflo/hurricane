@@ -2,12 +2,9 @@ import os
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-CONSUMERS = (
+HANDLERS = (
     'hurricane.consumers.printing',
     'hurricane.consumers.comet',
-)
-
-PRODUCERS = (
     'hurricane.producers.random_data',
 )
 

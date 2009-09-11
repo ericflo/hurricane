@@ -21,20 +21,14 @@ class ApplicationManager(object):
         django_settings.configure(settings)
 
         self.producer_queue = multiprocessing.Queue()
-
-        for producer in settings.PRODUCERS:
-            ProducerClass = import_module(producer).Producer
-            producer = ProducerClass(settings, self.producer_queue)
-            multiprocessing.Process(target=producer.run_base).start()
-
         self.receiver_queues = []
 
-        for consumer in settings.CONSUMERS:
-            ConsumerClass = import_module(consumer).Consumer
+        for handler in settings.HANDLERS:
+            HandlerClass = import_module(handler).Handler
             recv_queue = multiprocessing.Queue()
-            consumer = ConsumerClass(settings, recv_queue)
+            handler = HandlerClass(settings, recv_queue, self.producer_queue)
             self.receiver_queues.append(recv_queue)
-            multiprocessing.Process(target=consumer.run_base).start()
+            multiprocessing.Process(target=handler.run_base).start()
 
         while True:
             item = self.producer_queue.get()
