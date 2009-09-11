@@ -9,7 +9,7 @@ $(function() {
     Hurricane.add_callback('chat', callback);
 
     $('#chat-input').submit(function () {
-        var data = $('#message').value();
+        var data = $('#message').val();
         $.ajax({
             url: '/comet/',
             method: 'POST',
