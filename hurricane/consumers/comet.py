@@ -30,7 +30,6 @@ class Consumer(BaseConsumer):
         IOLoop.instance().stop()
     
     def message(self, msg):
-        print "HAI %s" % (msg,)
         msg = msg._asdict()
         dt = msg.pop('timestamp')
         epoch = int(dt.strftime('%s'))
