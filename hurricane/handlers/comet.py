@@ -43,6 +43,7 @@ class Handler(BaseConsumer):
         if request.method == 'POST':
             self.out_queue.put(Message('comet', datetime.now(),
                 simplejson.loads(request.body)))
+            request.finish()
         else:
             self.requests.put(request)
 
