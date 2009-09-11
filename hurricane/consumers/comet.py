@@ -22,7 +22,38 @@ class Consumer(BaseConsumer):
         IOLoop.instance().start()
     
     def handle_request(self, request):
+        urls = [
+            ('/comet/', self.comet_view),
+            ('/', self.wsgi_view),
+        ]
+        for url, view in urls:
+            if request.path.startswith(url):
+                return view(request)
+        
+    def comet_view(self, request):
         self.requests.put(request)
+    
+    def wsgi_view(self, request):
+        environ = {
+            'REQUEST_METHOD': request.method,
+            'SCRIPT_NAME':  request.path,
+            'PATH_INFO': request.path,
+            'QUERY_STRING': request.query,
+            'CONTENT_TYPE': request.headers['Content-Type'],
+            'CONTENT_LENGTH': request.headers['Content-Length'],
+            'SERVER_NAME': request.host,
+            'SERVER_PORT': self.settings.COMET_PORT,
+            'SERVER_PROTOCOL': 'HTTP/1.1',
+        }
+        def start_response(status, headers):
+            request.write('HTTP/1.1 %(status)s\r\n%(headers)s' % {
+                'status': status,
+                'headers': '\r\n'.join('%s: %s' % (k, v) for k, v in headers)
+            })
+        wsgi_app = import_module(self.settings.WSGI_CALLABLE).application
+        response = wsgi_app(environ, start_response)
+        request.write(''.join(response))
+        request.finalize()
     
     def message(self, msg):
         msg = msg._asdict()
