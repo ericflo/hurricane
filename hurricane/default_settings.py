@@ -14,5 +14,6 @@ PRODUCERS = (
 LOG_FILE = 'message-log.txt'
 
 COMET_PORT = 8000
+COMET_CACHE_SIZE = 200
 
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')

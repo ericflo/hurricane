@@ -11,6 +11,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
 from hurricane.base import BaseConsumer
+from hurricane.utils import RingBuffer
 
 
 def json_http_response(json):
@@ -25,6 +26,7 @@ class Consumer(BaseConsumer):
         self.server = HTTPServer(self.handle_request)
         self.server.listen(self.settings.COMET_PORT)
         self.thread = threading.Thread(target=IOLoop.instance().start).start()
+        self.messages = RingBuffer(self.settings.COMET_CACHE_SIZE)
         self.urls = self.get_urls()
     
     def get_urls(self):
@@ -77,14 +79,27 @@ class Consumer(BaseConsumer):
         msg.update({
             'id': str(uuid.uuid4()),
             'timestamp': timestamp,
-            # TODO: Figure out what else we need to add to these messages
         })
-        json = simplejson.dumps(msg)
-        response = json_http_response(json)
+        self.messages.append(msg)
+        self.respond_to_requests()
+    
+    def respond_to_requests(self):
         while True:
             try:
                 request = self.requests.get(block=False)
             except Empty:
                 return
+            print request.arguments
+            cursor = request.arguments.get('cursor', [None])[0]
+            seen = False
+            messages_to_send = []
+            for msg in self.messages:
+                if not seen and msg['id'] == cursor:
+                    seen = True
+                if seen:
+                    messages_to_send.append(msg)                    
+            messages_to_send = messages_to_send or list(self.messages)
+            json = simplejson.dumps({'messages': messages_to_send})
+            response = json_http_response(json)
             request.write(response)
             request.finish()
