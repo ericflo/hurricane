@@ -1,5 +1,8 @@
+#!/usr/bin/env python
+
 import optparse
 
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
 def main():
@@ -7,6 +10,8 @@ def main():
     parser.add_option('--settings', dest='settings')
     
     options, args = parser.parse_args()
+    if not options.settings:
+        raise ImproperlyConfigured("You didn't provide a settings module.")
     settings = import_module(options.settings)
     
     for consumer in settings.CONSUMERS:
