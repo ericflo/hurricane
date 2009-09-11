@@ -49,12 +49,12 @@ class Consumer(BaseConsumer):
             return
         length = len(f)
         content_type = 'text/plain'
-        self.write('HTTP/1.1 200 OK\r\nContent-Length: %s\r\nContent-Type: %s\r\n\r\n%s' % (
+        request.write('HTTP/1.1 200 OK\r\nContent-Length: %s\r\nContent-Type: %s\r\n\r\n%s' % (
             length,
             content_type,
             f
         ))
-        self.finalize()
+        request.finish()
 
     def shutdown(self):
         print 'Shutting Down'
