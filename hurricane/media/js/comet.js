@@ -13,7 +13,6 @@ var Hurricane = (function() {
             var messages = JSON.parse(response).messages;
             this.cursor = messages[messages.length-1].id;
             for (var msg_idx in messages) {
-                /* TODO: Make this dispatch */
                 var msg = messages[msg_idx];
                 var callback = this.callbacks[msg.kind];
                 if(callback) {
