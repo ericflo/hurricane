@@ -35,7 +35,7 @@ var Hurricane = (function() {
             var hurricane = this;
             $.ajax({
                 url: this.url,
-                type: 'POST',
+                type: 'GET',
                 dataType: 'text',
                 data: args,
                 success: function(response) {
