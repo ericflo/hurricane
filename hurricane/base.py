@@ -1,5 +1,7 @@
 import Queue
 
+from collections import namedtuple
+
 class PubSubBase(object):
     def __init__(self, settings, queue):
         self.settings = settings
@@ -22,3 +24,5 @@ class BaseConsumer(object):
 
 class BaseProducer(object):
     pass
+
+Message = namedtuple('Message', 'kind timestamp raw_data')
