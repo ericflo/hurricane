@@ -21,13 +21,16 @@ class Consumer(BaseConsumer):
         self.server = HTTPServer(self.handle_request)
         self.server.listen(self.settings.COMET_PORT)
         self.thread = threading.Thread(target=IOLoop.instance().start).start()
+        self.urls = self.get_urls()
     
-    def handle_request(self, request):
-        urls = [
+    def get_urls(self):
+        return (
             ('/comet/', self.comet_view),
             ('/', self.wsgi_view),
-        ]
-        for url, view in urls:
+        ) 
+    
+    def handle_request(self, request):
+        for url, view in self.urls:
             if request.path.startswith(url):
                 return view(request)
         
