@@ -1,1 +1,2 @@
 -e git://github.com/facebook/tornado.git#egg=tornado
+Django>=1.1
