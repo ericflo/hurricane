@@ -8,3 +8,5 @@ PRODUCERS = (
 )
 
 LOG_FILE = 'message-log.txt'
+
+COMET_PORT = 8000
