@@ -11,7 +11,9 @@ $(function() {
     $('#chat-input').submit(function () {
         var data = $('#message').value()
         $.ajax({
-
+            url: '/comet/',
+            method: 'POST',
+            data: data
         })
     });
 });
