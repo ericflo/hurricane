@@ -3,9 +3,8 @@ import os
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 HANDLERS = (
-    #'hurricane.handlers.printing',
     'hurricane.handlers.comet',
-    'hurricane.handlers.twitter',
+    'spritzer_handler',
 )
 
 LOG_FILE = 'message-log.txt'

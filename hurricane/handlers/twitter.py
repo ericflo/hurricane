@@ -13,8 +13,6 @@ class Handler(BaseProducer):
 
     @run_until_stopped
     def run(self):
-        #twitstream.track(self.settings.TWITTER_USERNAME,
-        #    self.settings.TWITTER_PASSWORD, self.process_tweet,
-        #    track=','.join(self.settings.TWITTER_KEYWORDS)).run()
-        twitstream.spritzer(self.settings.TWITTER_USERNAME,
-            self.settings.TWITTER_PASSWORD, self.process_tweet).run()
+        twitstream.track(self.settings.TWITTER_USERNAME,
+            self.settings.TWITTER_PASSWORD, self.process_tweet,
+            track=','.join(self.settings.TWITTER_KEYWORDS)).run()
