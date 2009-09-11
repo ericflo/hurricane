@@ -1,6 +1,6 @@
 $(function() {
     var on_success = function(response) {
-        $('body').append(response);
+        $('.items').prepend('<li>' + response + '</li>');
         ajax_request();
     };
     

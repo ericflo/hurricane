@@ -14,3 +14,55 @@ ol, ul, li {list-style-position:outside;list-style:none;}
 * a {position:relative;} /* Gets links displaying over a PNG background */
 a {outline:none;} /* Gets rid of Firefox's dotted borders */
 a img {border:none;} /* Gets rid of IE's blue borders */
+
+#container {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: #E7E7E7 none repeat scroll 0 0;
+    min-height: 240px;
+    padding: 10px;
+}
+
+.wrapper {
+    margin: 0 auto;
+    width: 950px;
+}
+
+#row-3 {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    background: #DDDDDD none repeat scroll 0 0;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+}
+
+#row-3 h2 {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    -moz-border-radius-bottomleft: 4px;
+    -moz-border-radius-bottomright: 4px;
+    -moz-border-radius-topleft: 4px;
+    -moz-border-radius-topright: 4px;
+    background: #67804D none repeat scroll 0 0;
+    border-top: 1px solid #B4D590;
+    color: #FFFFFF !important;
+    padding-left: 10px;
+}
+
+h2.home small {
+    float: right;
+    font-size: 0.7em;
+    margin-right: 10px;
+}
+
+.clearfix {
+    display: block;
+}
+
