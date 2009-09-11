@@ -5,7 +5,7 @@ address, caption, cite, code, dfn, em, strong, th, var {font-style:normal;font-w
 caption, th {text-align:left;}
 h1, h2, h3, h5, h5, h6 {font-size:100%;}
 q:before, q:after {content:'';}
- 
+
 /* Global reset-RESET */
 /* The below restores some sensible defaults */
 strong {font-weight:bold;}
@@ -65,4 +65,3 @@ h2.home small {
 .clearfix {
     display: block;
 }
-

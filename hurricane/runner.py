@@ -15,18 +15,18 @@ class ApplicationManager(object):
         parser = optparse.OptionParser()
         parser.add_option('--settings', dest='settings',
             default='hurricane.default_settings')
-        
+
         options, args = parser.parse_args()
         settings = import_module(options.settings)
         django_settings.configure(settings)
-        
+
         self.producer_queue = multiprocessing.Queue()
-        
+
         for producer in settings.PRODUCERS:
             ProducerClass = import_module(producer).Producer
             producer = ProducerClass(settings, self.producer_queue)
             multiprocessing.Process(target=producer.run_base).start()
-        
+
         self.receiver_queues = []
 
         for consumer in settings.CONSUMERS:
@@ -35,7 +35,7 @@ class ApplicationManager(object):
             consumer = ConsumerClass(settings, recv_queue)
             self.receiver_queues.append(recv_queue)
             multiprocessing.Process(target=consumer.run_base).start()
-        
+
         while True:
             item = self.producer_queue.get()
             for recv_queue in self.receiver_queues:
