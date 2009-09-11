@@ -5,6 +5,7 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 HANDLERS = (
     'hurricane.handlers.comet',
     'chat.chat_handler',
+    'hurricane.handlers.printing',
 )
 
 LOG_FILE = 'message-log.txt'

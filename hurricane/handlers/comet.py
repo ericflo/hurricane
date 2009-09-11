@@ -12,8 +12,8 @@ from django.utils._os import safe_join
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
-from hurricane.base import BaseConsumer
-from hurricane.utils import RingBuffer, HttpResponse, Message
+from hurricane.base import BaseConsumer, Message
+from hurricane.utils import RingBuffer, HttpResponse
 
 class Handler(BaseConsumer):
     def initialize(self):
