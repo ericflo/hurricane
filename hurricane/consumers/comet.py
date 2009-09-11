@@ -30,6 +30,7 @@ class Consumer(BaseConsumer):
         IOLoop.instance().stop()
     
     def message(self, msg):
+        print "HAI %s" % (msg,)
         msg = msg._asdict()
         dt = msg.pop('timestamp')
         epoch = int(dt.strftime('%s'))
@@ -44,7 +45,7 @@ class Consumer(BaseConsumer):
         response = json_http_response(json)
         while True:
             try:
-                request = self.requests.get()
+                request = self.requests.get(block=False)
             except Empty:
                 return
             request.write(response)
