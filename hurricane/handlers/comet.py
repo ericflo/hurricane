@@ -1,3 +1,4 @@
+from datetime import datetime
 import threading
 import uuid
 import mimetypes
@@ -12,7 +13,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
 from hurricane.base import BaseConsumer
-from hurricane.utils import RingBuffer, HttpResponse
+from hurricane.utils import RingBuffer, HttpResponse, Message
 
 class Handler(BaseConsumer):
     def initialize(self):
@@ -39,7 +40,11 @@ class Handler(BaseConsumer):
         request.finish()
 
     def comet_view(self, request):
-        self.requests.put(request)
+        if request.method == 'POST':
+            self.out_queue.write(Message('comet', datetime.now(),
+                simplejson.loads(request.body)))
+        else:
+            self.requests.put(request)
 
     def media_view(self, request, base_path, url_part):
         path = safe_join(base_path, request.path[len(url_part):])
