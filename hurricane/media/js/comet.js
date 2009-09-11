@@ -2,11 +2,15 @@ $(function() {
     var cursor = null;
     
     var on_success = function(response) {
-        $('body').append(response + '<br><br>');
         var messages = JSON.parse(response).messages;
         cursor = messages[messages.length-1].id;
         /*ajax_request();*/
-        setTimeout(ajax_request, 2000);
+        for(var msg_idx in messages) {
+            var msg = messages[msg_idx];
+            var json_msg = JSON.stringify(msg);
+            $('.items').prepend('<li>' + json_msg + '</li>');
+        }
+        ajax_request();
     };
     
     var on_error = function(response) {
