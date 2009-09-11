@@ -8,7 +8,6 @@ $(function() {
         ajax_request();
     };
     var on_error = function(response) {
-        alert(response);
         ajax_request();
     };
     
