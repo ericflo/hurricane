@@ -19,17 +19,17 @@ class ApplicationManager(object):
         self.producer_queue = multiprocessing.Queue()
         
         for producer in settings.PRODUCERS:
-            ProducerClass = import_module(producer + '.Producer')
+            ProducerClass = import_module(producer).Producer
             producer = ProducerClass(settings, self.producer_queue)
             multiprocessing.Process(target=producer.run).start()
         
         self.receiver_queues = []
 
         for consumer in settings.CONSUMERS:
-            ConsumerClass = import_module(consumer + '.Consumer')
+            ConsumerClass = import_module(consumer).Consumer
             recv_queue = multiprocessing.Queue()
             consumer = ConsumerClass(settings, recv_queue)
-            self.receiever_queues.append(recv_queue)
+            self.receiver_queues.append(recv_queue)
             multiprocessing.Process(target=consumer.run).start()
         
         while True:
