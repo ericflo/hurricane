@@ -3,6 +3,7 @@
 import multiprocessing
 import optparse
 
+from django.conf import settings as django_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
@@ -18,6 +19,7 @@ class ApplicationManager(object):
         if not options.settings:
             raise ImproperlyConfigured("You didn't provide a settings module.")
         settings = import_module(options.settings)
+        django_settings.configure(settings)
         
         self.producer_queue = multiprocessing.Queue()
         
