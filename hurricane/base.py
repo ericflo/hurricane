@@ -2,6 +2,8 @@ import Queue
 
 from collections import namedtuple
 
+from hurricane.utils import run_until_stopped
+
 class PubSubBase(object):
     def __init__(self, settings, queue):
         self.settings = settings
@@ -11,6 +13,7 @@ class PubSubBase(object):
         raise NotImplemented
 
 class BaseConsumer(PubSubBase):
+    @run_until_stopped
     def run(self):
         while True:
             try:

@@ -6,7 +6,10 @@ import optparse
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
+from hurricane.utils import run_until_stopped
+
 class ApplicationManager(object):
+    @run_until_stopped
     def run(self):
         parser = optparse.OptionParser()
         parser.add_option('--settings', dest='settings')
