@@ -91,5 +91,8 @@ class Consumer(BaseConsumer):
             messages_to_send = messages_to_send or list(self.messages)
             json = simplejson.dumps({'messages': messages_to_send})
             response = HttpResponse(200, 'application/json', json)
-            request.write(response.as_bytes())
+            try:
+                request.write(response.as_bytes())
+            except IOError:
+                return
             request.finish()
