@@ -11,13 +11,38 @@ from django.utils._os import safe_join
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
-from hurricane import default_settings
 from hurricane.base import BaseConsumer
 from hurricane.utils import RingBuffer, HttpResponse
 
-def media_view(base, root):
-    def _inner(request):
-        path = safe_join(root, request.path[len(base):])
+class Handler(BaseConsumer):
+    def initialize(self):
+        self.requests = Queue(0)
+        self.server = HTTPServer(self.handle_request)
+        self.server.listen(self.settings.COMET_PORT)
+        self.thread = threading.Thread(target=IOLoop.instance().start).start()
+        self.messages = RingBuffer(self.settings.COMET_CACHE_SIZE)
+        self.urls = self.get_urls()
+
+    def get_urls(self):
+        return (
+            ('/comet/', self.comet_view),
+            ('/global/', lambda r: self.media_view(r,
+                os.path.join(os.path.dirname(__file__), '..', 'media'), '/global/')),
+            ('/', lambda r: self.media_view(r, self.settings.MEDIA_ROOT, '/')),
+        )
+
+    def handle_request(self, request):
+        for url, view in self.urls:
+            if request.path.startswith(url):
+                return view(request)
+        request.write(HttpResponse(404).as_bytes())
+        request.finish()
+
+    def comet_view(self, request):
+        self.requests.put(request)
+
+    def media_view(self, request, base_path, url_part):
+        path = safe_join(base_path, request.path[len(url_part):])
         try:
             f = open(path).read()
         except (OSError, IOError):
@@ -32,35 +57,7 @@ def media_view(base, root):
         length = len(f)
         request.write(HttpResponse(200, content_type, f).as_bytes())
         request.finish()
-    return _inner
 
-class Handler(BaseConsumer):
-    def initialize(self):
-        self.requests = Queue(0)
-        self.server = HTTPServer(self.handle_request)
-        self.server.listen(self.settings.COMET_PORT)
-        self.thread = threading.Thread(target=IOLoop.instance().start).start()
-        self.messages = RingBuffer(self.settings.COMET_CACHE_SIZE)
-        self.global_root = os.path.join(default_settings.PROJECT_ROOT, 'media')
-        print self.global_root
-        self.urls = self.get_urls()
-
-    def get_urls(self):
-        return (
-            ('/comet/', self.comet_view),
-            ('/global/', media_view('/global/', self.global_root)),
-            ('/', media_view('/', self.settings.MEDIA_ROOT)),
-        )
-
-    def handle_request(self, request):
-        for url, view in self.urls:
-            if request.path.startswith(url):
-                return view(request)
-        request.write(HttpResponse(404).as_bytes())
-        request.finish()
-
-    def comet_view(self, request):
-        self.requests.put(request)
 
     def shutdown(self):
         print 'Shutting Down'
