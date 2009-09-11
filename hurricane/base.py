@@ -8,6 +8,10 @@ class PubSubBase(object):
     def __init__(self, settings, queue):
         self.settings = settings
         self.queue = queue
+        self.initialize()
+    
+    def initialize(self):
+        pass
     
     def run(self):
         raise NotImplemented
