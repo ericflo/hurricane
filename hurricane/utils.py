@@ -13,8 +13,21 @@ def run_until_stopped(func):
             except (IndexError, AttributeError):
                 pass
             pass
-    
+
     return wrapped
+
+class HttpResponse(object):
+    def __init__(self, status_code, content_type=None, body=''):
+        self.status_code = status_code
+        self.content_type = content_type or 'text/plain'
+        self.body = body
+
+    def as_bytes(self):
+        response = 'HTTP/1.1 %s\r\n' % self.status_code
+        response += 'Content-Length: %s\r\n' % len(self.body)
+        response += 'Content-Type: %s\r\n\r\n' % self.content_type
+        response += self.body
+        return response
 
 class RingBuffer(collections.deque):
     """
