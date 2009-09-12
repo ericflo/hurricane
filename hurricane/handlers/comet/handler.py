@@ -48,6 +48,9 @@ class CometHandler(BaseHandler):
                 return view(request)
         request.write(HttpResponse(404).as_bytes())
         request.finish()
+        
+    ### THE BELOW HAVE A BAD ABSTRACTION
+    ### TODO: Fix the abstraction
 
     def comet_view(self, request):
         if request.method == 'POST':
