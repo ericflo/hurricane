@@ -3,9 +3,7 @@ import os
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 HANDLERS = (
-#    'hurricane.handlers.comet',
     'spritzer.spritzer_handler.SpritzerHandler',
-    #'hurricane.handlers.printing.PrintingHandler',
     'hurricane.handlers.comet.CometHandler',
 )
 

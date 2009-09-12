@@ -40,7 +40,7 @@ class CometHandler(BaseHandler):
 
     def comet_view(self, request):
         if request.method == 'POST':
-            self.out_queue.put(Message('comet', datetime.now(),
+            self.publish(Message('comet', datetime.now(),
                 simplejson.loads(request.body)))
             request.write(HttpResponse(201).as_bytes())
             request.finish()
