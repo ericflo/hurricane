@@ -12,7 +12,7 @@ from tornado.ioloop import IOLoop
 
 from hurricane.handlers.base import BaseHandler
 from hurricane.base import Message
-from hurricane.utils import RingBuffer, HttpResponse, message_after
+from hurricane.utils import RingBuffer, HttpResponse
 
 class CometHandler(BaseHandler):
     def initialize(self):
@@ -83,11 +83,9 @@ class CometHandler(BaseHandler):
 
     def respond_to_request(self, request):
         cursor = request.arguments.get('cursor', [None])[0]
-        messages_to_send = (
-            list(message_after(self.messages, lambda x: x['id'] == cursor))
-            or list(self.messages)
-        )
-        json = simplejson.dumps({'messages': messages_to_send})
+        messages = list(self.messages.after_match(lambda x: x['id'] == cursor,
+                                                  full_fallback=True))
+        json = simplejson.dumps({'messages': messages})
         response = HttpResponse(200, 'application/json', json)
         try:
             request.write(response.as_bytes())

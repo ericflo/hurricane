@@ -72,3 +72,16 @@ class RingBuffer(collections.deque):
 
     def get(self):
         return list(self)
+
+    def after_match(self, func, full_fallback=False):
+        """Returns an iterator for all the elements after the first
+        match.  If `full_fallback` is `True`, it will return all the
+        messages if the function never matched.
+        """
+        iterator = iter(self)
+        for item in iterator:
+            if func(item):
+                return iterator
+        if full_fallback:
+            iterator = iter(self)
+        return iterator

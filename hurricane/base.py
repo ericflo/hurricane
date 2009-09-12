@@ -16,3 +16,6 @@ class Message(object):
     
     def __str__(self):
         return str(self._asdict())
+
+    def __repr__(self):
+        return '<%s %r>' % (type(self).__name__, str(self))
