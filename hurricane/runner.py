@@ -3,7 +3,7 @@
 import multiprocessing
 import optparse
 
-from hurricane.utils import run_until_stopped, import_string
+from hurricane.utils import import_string
 
 def main(settings):
     manager = import_string(settings.APPLICATION_MANAGER)

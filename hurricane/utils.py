@@ -2,19 +2,6 @@ import collections
 from functools import wraps
 from itertools import islice
 
-def run_until_stopped(func):
-    @wraps(func)
-    def wrapped(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except (KeyboardInterrupt, SystemExit):
-            try:
-                self = args[0]
-                self.shutdown()
-            except (IndexError, AttributeError):
-                pass
-    return wrapped
-
 def import_string(import_name, silent=False):
     """Imports an object based on a string.  This is useful if you want to
     use import paths as endpoints or something similar.  An import path can

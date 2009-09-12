@@ -5,10 +5,8 @@ import time
 
 from hurricane.base import Message
 from hurricane.handlers.base import BaseHandler
-from hurricane.utils import run_until_stopped
 
 class RandomDataHandler(BaseHandler):
-    @run_until_stopped
     def run(self):
         while True:
             msg = Message('random', datetime.now(),

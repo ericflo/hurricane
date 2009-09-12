@@ -1,6 +1,5 @@
 import Queue
 
-from hurricane.utils import run_until_stopped
 
 class Message(object):
     def __init__(self, kind, timestamp, raw_data):
