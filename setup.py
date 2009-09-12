@@ -14,6 +14,7 @@ setup(
     keywords="comet,asynchronous,messages,messaging,framework",
     packages = ["hurricane", "hurricane.handlers", "hurricane.managers"],
     author="The Hurricane Development Team",
+    author_email="floguy+hurricane@gmail.com",
     license='BSD',
     url="http://github.com/ericflo/hurricane",
 )
