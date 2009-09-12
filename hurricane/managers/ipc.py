@@ -34,6 +34,10 @@ class ApplicationManager(base.BaseApplicationManager):
         self.pipe, opipe = multiprocessing.Pipe()
         publisher = Publisher(settings, opipe)
         super(ApplicationManager, self).__init__(settings, publisher)
+
+    def publish(self, channel, message):
+        for handler in self._channels[channel]:
+            self._queues[handler].put(message)
     
     def subscribe(self, channel, handler):
         self._channels[channel].add(handler)
@@ -44,6 +48,5 @@ class ApplicationManager(base.BaseApplicationManager):
     def run(self):
         super(ApplicationManager, self).run()
         while True:
-            channel, msg = self.pipe.recv()
-            for handler in self._channels[channel]:
-                self._queues[handler].put(msg)
+            channel, message = self.pipe.recv()
+            self.publish(channel, message)

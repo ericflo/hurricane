@@ -67,6 +67,9 @@ class ApplicationManager(base.BaseApplicationManager):
         self._handler_subscriptions = defaultdict(set)
         publisher = Publisher(settings)
         super(ApplicationManager, self).__init__(settings, publisher)
+
+    def publish(self, channel, message):
+        self.publisher(channel, message)
     
     def subscribe(self, channel, handler):
         self._handler_subscriptions[handler].add(channel)
