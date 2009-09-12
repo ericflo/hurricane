@@ -10,9 +10,8 @@ if __name__ == '__main__':
     sys.path.append(PROJECT_ROOT)
     sys.path.append(HURRICANE_ROOT)
 
-    from hurricane.runner import ApplicationManager
+    from hurricane.runner import main
+        
+    import settings
 
-    sys.argv = ['spritzer-demo', '--settings', 'spritzer.settings']
-
-    app = ApplicationManager()
-    app.run()
+    main(settings)

@@ -14,7 +14,7 @@ from hurricane.handlers.base import BaseHandler
 from hurricane.base import Message
 from hurricane.utils import RingBuffer, HttpResponse, message_after
 
-class Handler(BaseHandler):
+class CometHandler(BaseHandler):
     def initialize(self):
         self.requests = Queue(0)
         self.server = HTTPServer(self.handle_request)
@@ -68,12 +68,7 @@ class Handler(BaseHandler):
         request.write(HttpResponse(200, content_type, f).as_bytes())
         request.finish()
 
-
-    def shutdown(self):
-        print 'Shutting Down'
-        IOLoop.instance().stop()
-
-    def message(self, msg):
+    def receive(self, msg):
         msg = msg._asdict()
         dt = msg.pop('timestamp')
         epoch = int(dt.strftime('%s'))
