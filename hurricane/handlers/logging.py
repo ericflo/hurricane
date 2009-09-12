@@ -1,7 +1,8 @@
-from hurricane.base import BaseConsumer
+from __future__ import with_statement
 
-class Handler(BaseConsumer):
+from hurricane.handlers.base import BaseHandler
+
+class LoggingHandler(BaseHandler):
     def message(self, msg):
-        f = open(self.settings.LOG_FILE, 'a')
-        f.write(str(msg) + '\n')
-        f.close()
+        with open(self.settings.LOG_FILE, 'a') as f:
+            f.write("%s\n" % msg)

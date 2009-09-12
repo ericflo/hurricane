@@ -1,5 +1,5 @@
-from hurricane.base import BaseConsumer
+from hurricane.handlers.base import BaseHandler
 
-class Handler(BaseConsumer):
+class PrintingHandler(BaseHandler):
     def message(self, msg):
-        print str(msg)
+        print msg

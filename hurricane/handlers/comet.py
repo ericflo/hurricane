@@ -7,15 +7,14 @@ from Queue import Queue, Empty
 
 import simplejson
 
-from django.utils._os import safe_join
-
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
-from hurricane.base import BaseConsumer, Message
+from hurricane.handlers.base import BaseHandler
+from hurricane.base import Message
 from hurricane.utils import RingBuffer, HttpResponse, message_after
 
-class Handler(BaseConsumer):
+class Handler(BaseHandler):
     def initialize(self):
         self.requests = Queue(0)
         self.server = HTTPServer(self.handle_request)
@@ -53,11 +52,11 @@ class Handler(BaseConsumer):
                 self.requests.put(request)
 
     def media_view(self, request, base_path, url_part):
-        path = safe_join(base_path, request.path[len(url_part):])
+        path = os.path.join(base_path, request.path[len(url_part):].lstrip('/'))    
         try:
             f = open(path).read()
         except (OSError, IOError):
-            path = safe_join(path, 'index.html')
+            path = os.path.join(path, 'index.html')
             try:
                 f = open(path).read()
             except (OSError, IOError):

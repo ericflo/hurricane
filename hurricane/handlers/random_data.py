@@ -3,14 +3,15 @@ import random
 import string
 import time
 
-from hurricane.base import BaseProducer, Message
+from hurricane.base import Message
+from hurricane.handlers.base import BaseHandler
 from hurricane.utils import run_until_stopped
 
-class Handler(BaseProducer):
+class RandomDataHandler(BaseHandler):
     @run_until_stopped
     def run(self):
         while True:
             msg = Message('random', datetime.now(),
                 ''.join(random.sample(string.letters, 8)))
-            self.out_queue.put(msg)
+            self.publish(msg)
             time.sleep(1)

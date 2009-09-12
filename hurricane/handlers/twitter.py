@@ -2,13 +2,14 @@ from datetime import datetime
 
 from twitstream import twitstream
 
-from hurricane.base import BaseProducer, Message
+from hurricane.base import Message
+from hurricane.handlers.base import BaseHandler
 from hurricane.utils import run_until_stopped
 
-class Handler(BaseProducer):
+class TwitterHandler(BaseHandler):
     def process_tweet(self, msg):
         msg = Message('tweet', datetime.now(), msg)
-        self.out_queue.put(msg)
+        self.publish(msg)
 
 
     @run_until_stopped
