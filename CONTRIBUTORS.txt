@@ -1,4 +1,4 @@
 Eric Florenzano <floguy@gmail.com>
 Alex Gaynor <alex.gaynor@gmail.com>
-Mike Malone <mmalone@gmail.com>
+Mike Malone <mjmalone@gmail.com>
 Armin Ronacher <armin.ronacher@active-4.com>
