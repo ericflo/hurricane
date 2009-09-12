@@ -21,7 +21,7 @@ def main(settings):
     try:
         app_manager.run()
     except KeyboardInterrupt:
-        pass
+        print "interrupted"
 
 if __name__ == '__main__':
     runcli()
