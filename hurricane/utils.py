@@ -27,15 +27,6 @@ def import_string(import_name, silent=False):
         if not silent:
             raise
 
-def message_after(it, func):
-    seen = False
-    for item in it:
-        if not seen:
-            if func(item):
-                seen = True
-        else:
-            yield item
-
 class HttpResponse(object):
     def __init__(self, status_code, content_type=None, body=''):
         self.status_code = status_code
@@ -60,7 +51,17 @@ class RingBuffer(collections.deque):
         collections.deque.__init__(self)
         self.size = size
 
-    def full_append(self, item):
+    def remove(self, item):
+        raise TypeError('you cannot remove an item from the ring buffer')
+
+    def __delitem__(self, x):
+        raise TypeError('you cannot slice or delete from the ring buffer')
+
+    def clear(self):
+        super(RingBuffer, self).clear()
+        self.append = type(self).append
+
+    def _full_append(self, item):
         collections.deque.append(self, item)
         # full, pop the oldest item, left most item
         self.popleft()
@@ -68,10 +69,7 @@ class RingBuffer(collections.deque):
     def append(self, item):
         collections.deque.append(self, item)
         if len(self) == self.size:
-            self.append = self.full_append
-
-    def get(self):
-        return list(self)
+            self.append = self._full_append
 
     def after_match(self, func, full_fallback=False):
         """Returns an iterator for all the elements after the first
