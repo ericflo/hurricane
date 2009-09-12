@@ -20,13 +20,11 @@ class BaseApplicationManager(object):
         self.handler_classes = [import_string(handler) for handler in settings.HANDLERS]
         self.handlers = [obj(settings, self) for obj in self.handler_classes]
     
-    def publish(self, channel, message):
-        raise NotImplementedError
-    
     def subscribe(self, channel, handler):
         raise NotImplementedError
     
     def unsubscribe(self, channel, handler):
+        # TODO: Implement this in the subclasses
         raise NotImplementedError
     
     def run(self):

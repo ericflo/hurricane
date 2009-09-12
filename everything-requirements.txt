@@ -1,0 +1,4 @@
+simplejson
+http://stomppy.googlecode.com/files/stomp.py-2.0.2.tar.gz
+-e git://github.com/facebook/tornado.git#egg=tornado
+-e git://github.com/ericflo/twitstream.git#egg=twitstream
