@@ -8,6 +8,7 @@ from hurricane.utils import run_until_stopped, import_string
 def main(settings):
     manager = import_string(settings.APPLICATION_MANAGER)
     app_manager = manager.ApplicationManager(settings)
+    app_manager.run()
 
 if __name__ == '__main__':
     parser = optparse.OptionParser()

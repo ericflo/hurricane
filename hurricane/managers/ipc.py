@@ -1,8 +1,22 @@
 import multiprocessing
+import Queue
 
 from collections import defaultdict
 
 from hurricane.managers import base
+
+
+class SubscriptionManager(base.BaseSubscriptionManager):
+    def __init__(self, settings, handler, queue):
+        super(SubscriptionManager, self).__init__(settings, handler)
+        self.queue = queue
+
+    def run(self):
+        while True:
+            try:
+                self.receive(self.queue.get())
+            except Queue.Empty:
+                pass
 
 
 class Publisher(base.BasePublisher):
@@ -10,7 +24,7 @@ class Publisher(base.BasePublisher):
         self.pipe = pipe
             
     def __call__(self, channel, message):
-        self.pipe.put((channel, message))
+        self.pipe.send((channel, message))
 
 
 class ApplicationManager(base.BaseApplicationManager):    
@@ -22,10 +36,20 @@ class ApplicationManager(base.BaseApplicationManager):
         super(ApplicationManager, self).__init__(settings, publisher)
 
     def publish(self, channel, message):
+        print '%s: %s' % (channel, message)
         for handler in self._channels[channel]:
             self._queues[handler].put(message)
     
     def subscribe(self, channel, handler):
-        # Atomic due to defaultdict
-        self._queues[handler]
+        print '%s subscribed to %s' % (channel, handler)
         self._channels[channel].add(handler)
+    
+    def get_subscription_manager(self, handler):
+        return SubscriptionManager(self.settings, handler, self._queues[handler])
+    
+    def run(self):
+        super(ApplicationManager, self).run()
+        while True:
+            channel, msg = self.pipe.recv()
+            for handler in self._channels[channel]:
+                self._queues[handler].put(msg)

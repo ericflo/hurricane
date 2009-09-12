@@ -1,6 +1,7 @@
-from hurricane.handlers import HandlerType, get_handlers
+from multiprocessing import Queue
 
-class HandlerBase(object):    
+
+class BaseHandler(object):    
     @classmethod
     def channel(cls):
         return '%s.%s' % (cls.__module__, cls.__name__)
@@ -9,9 +10,9 @@ class HandlerBase(object):
         self.settings = settings
         self.publisher = app_manager.publisher
         for handler in app_manager.handler_classes:
-            app_manager.subscribe(handler.channel())
+            app_manager.subscribe(handler.channel(), self)
+        self.subscription_manager = app_manager.get_subscription_manager(self)
             
-
     def initialize(self):
         pass
 
@@ -20,7 +21,10 @@ class HandlerBase(object):
         self.run()
 
     def run(self):
-        raise NotImplemented
+        self.subscription_manager.run()
+    
+    def receive(self, msg):
+        pass
     
     def publish(self, msg):
         return self.publisher(self.channel(), msg)

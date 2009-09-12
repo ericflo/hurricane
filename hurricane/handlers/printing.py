@@ -1,5 +1,5 @@
 from hurricane.handlers.base import BaseHandler
 
 class PrintingHandler(BaseHandler):
-    def message(self, msg):
+    def receive(self, msg):
         print msg
