@@ -34,14 +34,8 @@ class ApplicationManager(base.BaseApplicationManager):
         self.pipe, opipe = multiprocessing.Pipe()
         publisher = Publisher(settings, opipe)
         super(ApplicationManager, self).__init__(settings, publisher)
-
-    def publish(self, channel, message):
-        print '%s: %s' % (channel, message)
-        for handler in self._channels[channel]:
-            self._queues[handler].put(message)
     
     def subscribe(self, channel, handler):
-        print '%s subscribed to %s' % (channel, handler)
         self._channels[channel].add(handler)
     
     def get_subscription_manager(self, handler):
