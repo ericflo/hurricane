@@ -3,9 +3,11 @@ from datetime import datetime
 from twitstream import twitstream
 
 from hurricane.base import Message
-from hurricane.handlers.base import BaseHandler
+from hurricane.handlers.base import PurePublishHandler
 
-class TwitterHandler(BaseHandler):
+
+class TwitterHandler(PurePublishHandler):
+
     def process_tweet(self, msg):
         msg = Message('tweet', datetime.now(), msg)
         self.publish(msg)

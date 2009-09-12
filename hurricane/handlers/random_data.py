@@ -4,9 +4,10 @@ import string
 import time
 
 from hurricane.base import Message
-from hurricane.handlers.base import BaseHandler
+from hurricane.handlers.base import PureConsumeHandler
 
-class RandomDataHandler(BaseHandler):
+class RandomDataHandler(PureConsumeHandler):
+
     def run(self):
         while True:
             msg = Message('random', datetime.now(),

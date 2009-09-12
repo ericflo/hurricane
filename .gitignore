@@ -4,3 +4,4 @@ pip-log.txt
 *local_settings.py
 *.egg-info
 env/*
+dist/*
