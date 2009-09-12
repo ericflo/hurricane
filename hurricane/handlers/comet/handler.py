@@ -1,7 +1,7 @@
 from datetime import datetime
 import threading
 import uuid
-import mimetypes
+
 import os
 from Queue import Queue, Empty
 
@@ -12,7 +12,10 @@ from tornado.ioloop import IOLoop
 
 from hurricane.handlers.base import BaseHandler
 from hurricane.base import Message
-from hurricane.utils import RingBuffer, HttpResponse
+from hurricane.utils import RingBuffer, HttpResponse, json_timestamp
+from hurricane.handlers.comet import views
+
+GLOBAL_MEDIA_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'media')
 
 class CometHandler(BaseHandler):
     def initialize(self):
@@ -23,12 +26,20 @@ class CometHandler(BaseHandler):
         self.messages = RingBuffer(self.settings.COMET_CACHE_SIZE)
         self.urls = self.get_urls()
 
+    def receive(self, msg):
+        msg = msg._asdict()
+        msg.update({
+            'id': str(uuid.uuid4()),
+            'timestamp': json_timestamp(msg.pop('timestamp')),
+        })
+        self.messages.append(msg)
+        self.respond_to_requests()
+
     def get_urls(self):
         return (
             ('/comet/', self.comet_view),
-            ('/global/', lambda r: self.media_view(r,
-                os.path.join(os.path.dirname(__file__), '..', 'media'), '/global/')),
-            ('/', lambda r: self.media_view(r, self.settings.MEDIA_ROOT, '/')),
+            ('/global/', views.get_media_view(GLOBAL_MEDIA_ROOT, '/global/')),
+            ('/', views.get_media_view(self.settings.MEDIA_ROOT, '/')),
         )
 
     def handle_request(self, request):
@@ -37,6 +48,9 @@ class CometHandler(BaseHandler):
                 return view(request)
         request.write(HttpResponse(404).as_bytes())
         request.finish()
+        
+    ### THE BELOW HAVE A BAD ABSTRACTION
+    ### TODO: Fix the abstraction
 
     def comet_view(self, request):
         if request.method == 'POST':
@@ -50,36 +64,6 @@ class CometHandler(BaseHandler):
                 self.respond_to_request(request)
             else:
                 self.requests.put(request)
-
-    def media_view(self, request, base_path, url_part):
-        path = os.path.join(base_path, request.path[len(url_part):].lstrip('/'))    
-        try:
-            f = open(path).read()
-        except (OSError, IOError):
-            path = os.path.join(path, 'index.html')
-            try:
-                f = open(path).read()
-            except (OSError, IOError):
-                request.write(HttpResponse(404).as_bytes())
-                request.finish()
-                return
-        (content_type, encoding) = mimetypes.guess_type(path)
-        length = len(f)
-        request.write(HttpResponse(200, content_type, f).as_bytes())
-        request.finish()
-
-    def receive(self, msg):
-        msg = msg._asdict()
-        dt = msg.pop('timestamp')
-        epoch = int(dt.strftime('%s'))
-        usec = dt.microsecond
-        timestamp = epoch + (usec / 1000000.0)
-        msg.update({
-            'id': str(uuid.uuid4()),
-            'timestamp': timestamp,
-        })
-        self.messages.append(msg)
-        self.respond_to_requests()
 
     def respond_to_request(self, request):
         cursor = request.arguments.get('cursor', [None])[0]

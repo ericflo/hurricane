@@ -83,3 +83,9 @@ class RingBuffer(collections.deque):
         if full_fallback:
             iterator = iter(self)
         return iterator
+
+def json_timestamp(dt):
+    epoch = int(dt.strftime('%s'))
+    usec = dt.microsecond
+    timestamp = epoch + (usec / 1000000.0)
+    return timestamp

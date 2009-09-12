@@ -13,7 +13,6 @@ class BaseSubscriptionManager(object):
 
 
 class BaseApplicationManager(object):
-    
     def __init__(self, settings, publisher):
         self.publisher = publisher
         self.settings = settings
