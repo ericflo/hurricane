@@ -18,7 +18,10 @@ def runcli():
 def main(settings):
     manager = import_string(settings.APPLICATION_MANAGER)
     app_manager = manager.ApplicationManager(settings)
-    app_manager.run()
+    try:
+        app_manager.run()
+    except KeyboardInterrupt:
+        pass
 
 if __name__ == '__main__':
     runcli()

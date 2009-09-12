@@ -35,7 +35,10 @@ class BaseHandler(object):
     def run_base(self):
         """Initializes and runs."""
         self.initialize()
-        self.run()
+        try:
+            self.run()
+        except KeyboardInterrupt:
+            pass
 
     def run(self):
         """Runs the handler over the subscription manager."""
