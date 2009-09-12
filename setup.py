@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="hurricane",
@@ -12,8 +12,11 @@ setup(
         "Environment :: Web Environment",
     ],
     keywords="comet,asynchronous,messages,messaging,framework",
-    packages = ["hurricane", "hurricane.handlers", "hurricane.managers"],
     author="The Hurricane Development Team",
+    author_email="floguy+hurricane@gmail.com",
     license='BSD',
+    packages=find_packages(),
+    include_package_data=True,
+    zip_safe=False,
     url="http://github.com/ericflo/hurricane",
 )
