@@ -14,6 +14,7 @@ from hurricane.handlers.base import BaseHandler
 from hurricane.base import Message
 from hurricane.utils import RingBuffer, HttpResponse, json_timestamp
 from hurricane.handlers.comet import views
+from hurricane.handlers.comet.request import Request
 
 GLOBAL_MEDIA_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'media')
 
