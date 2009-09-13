@@ -4,9 +4,9 @@ import string
 import time
 
 from hurricane.base import Message
-from hurricane.handlers.base import PureConsumeHandler
+from hurricane.handlers.base import PurePublishHandler
 
-class RandomDataHandler(PureConsumeHandler):
+class RandomDataHandler(PurePublishHandler):
 
     def run(self):
         while True:
