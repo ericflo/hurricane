@@ -1,4 +1,4 @@
-from urllib2 import urlopen
+import urllib2
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -22,7 +22,12 @@ def index(request):
 # THIS IS A BAD IDEA, EVEN FOR DEV PROBABLY
 def proxy(request):
     if request.method == 'POST':
-        data = urlopen(settings.COMET_URL + request.path, request.raw_post_data).read()
+        url = settings.COMET_URL + request.path
+        data = request.raw_post_data
     else:
-        data = urlopen(settings.COMET_URL + request.get_full_path()).read()
-    return HttpResponse(data)
+        url = settings.COMET_URL + request.get_full_path()
+        data = None
+    headers = {'Cookie': request.environ['HTTP_COOKIE']}
+    req = urllib2.Request(url, data, headers)
+    resp = urllib2.urlopen(req).read()
+    return HttpResponse(resp)
