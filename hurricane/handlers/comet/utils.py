@@ -2,6 +2,8 @@ from simplejson import loads
 from Cookie import BaseCookie, Morsel, CookieError
 from hurricane.utils import cached_property
 
+_missing = object()
+
 
 def unquote_header_value(value):
     r"""Unquotes a header value.  (Reversal of :func:`quote_header_value`).
@@ -96,4 +98,4 @@ class Request(object):
         return cls(req.path, req.query, cookies, req.body)
 
     def __repr__(self):
-        return '<%s %r>' % (type(self).__name__,s elf.args)
+        return '<%s %r>' % (type(self).__name__, self.args)
