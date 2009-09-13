@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+ 
+{% block title %}Friend List - {{ block.super }}{% endblock %}
+ 
+{% block content %}
+    <div class="user-list">
+        {% ifequal list_type "followers" %}
+            <h2>People Who You Follow:</h2>
+        {% else %}
+            {% ifequal list_type "following" %}
+                <h2>People Following You:</h2>
+            {% else %}
+                <h2>People Who You Follow, Who Also Follow You:</h2>
+            {% endifequal %}
+        {% endifequal %}
+    
+    
+        {% for friend in friends %}
+            <div class="user{% if forloop.counter %% 8 %} last{% endif %}">
+                <a href="{{ friend.get_profile.get_absolute_url }}" class="thumb">
+                    <img src="{{ friend.get_profile.image_url }}" width="40px" height="40px" />
+                </a>
+                <a href="{{ friend.get_profile.get_absolute_url }}">{{ user.username }}</a>
+            </div>
+        {% empty %}
+            <p class="info">None</p>
+        {% endfor %}
+    </div>
+{% endblock %}
