@@ -7,7 +7,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^/?$', 'hubbub.views.index', name='index'),
+    url(r'^$', 'hubbub.views.index', name='index'),
     (r'^friends/', include('socialgraph.urls')),
     (r'^admin/', include(admin.site.urls)),
 )
