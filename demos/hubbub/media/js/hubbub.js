@@ -17,7 +17,7 @@ $(function() {
     
     function callback(data) {
         var msg = data.raw_data;
-        $('<li><div class="user"><a href="#">TEMP</a></div><span>' + msg.msg + '</span><div class="clear"></div></li>').insertAfter('#messages h2');
+        $('<li><div class="user"><a href="#">' + data.user_data.username + '</a></div><span>' + msg.msg + '</span><div class="clear"></div></li>').insertAfter('#messages h2');
         if ($('#messages li').length > 200) {
             $('#messages li:last').remove();
         }

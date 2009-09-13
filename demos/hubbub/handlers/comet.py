@@ -36,10 +36,16 @@ class CometHandler(BaseHandler):
         self.session_engine = engine = import_string(self.settings.SESSION_ENGINE)
 
     def receive(self, msg):
+        # TODO: Make the query parts async (create a handler to get sessionid/userinfo/socialgraph stuff?)
         msg = msg._asdict()
+        user_id = msg['raw_data']['user']
+        user = User.objects.get(id=user_id)
         msg.update({
             'id': str(uuid.uuid4()),
             'timestamp': json_timestamp(msg.pop('timestamp')),
+            'user_data': {
+                'username': user.username,
+            },
         })
         self.respond_to_requests(msg)
 
@@ -82,17 +88,19 @@ class CometHandler(BaseHandler):
 
     def respond_to_requests(self, msg):
         # TODO: Come up with a way to remove old, stale, requests
-        print "REQUESTS:", [r.uri + '\n' for r in self.requests]
         for i, request in enumerate(self.requests):
-            request = self.requests[0]
+            request = self.requests[i]
             if self.should_respond(request, msg):
-                # Remove the request from the list of active requests
-                del self.requests[i]
                 # Now, respond to it
                 json = simplejson.dumps({'messages': [msg]})
                 response = HttpResponse(200, 'application/json', json)
                 try:
                     request.write(response.as_bytes())
                 except (IOError, AssertionError):
-                    return
+                    # If we can't write to the request, remove it from our
+                    # list of active requests
+                    del self.requests[i]
+                    continue
                 request.finish()
+                # Remove the request from the list of active requests
+                del self.requests[i]
