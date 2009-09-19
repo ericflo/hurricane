@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import multiprocessing
 import optparse
 
 from hurricane.utils import import_string

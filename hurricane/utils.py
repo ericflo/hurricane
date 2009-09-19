@@ -1,6 +1,4 @@
-from functools import wraps
-from itertools import islice
-
+_missing = object()
 
 class cached_property(object):
     """A decorator that converts a function into a lazy property.  The
@@ -18,17 +16,6 @@ class cached_property(object):
     The class has to have a `__dict__` in order for this property to
     work.
     """
-
-    # If alex complains, this is a shorter version
-    #
-    #    def cached_property(f,_=[]):
-    #     def g(x,o,t=0):
-    #      if o is None:return t
-    #      v=vars(o).get(f.__name__,_)
-    #      if v is _:vars(o)[f.__name__]=v=f(o)
-    #      return v
-    #     return type('',(),{'__get__':g})()
-
     # implementation detail: this property is implemented as non-data
     # descriptor.  non-data descriptors are only invoked if there is
     # no entry with the same name in the instance's __dict__

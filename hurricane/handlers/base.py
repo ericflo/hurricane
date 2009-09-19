@@ -1,6 +1,3 @@
-from multiprocessing import Queue
-
-
 class BaseHandler(object):
     """Baseclass for all the handlers.  Each handler is guranteed to be
     executed by one thread only so unless the header spawns threads, the

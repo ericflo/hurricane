@@ -55,7 +55,7 @@ class CometHandler(BaseHandler):
                 if user in self.requests:
                     request = self.requests[user]
                     request.write(HttpResponse(200, 'application/json',
-                        simplejson.dumps({'messages': [msg]})).as_bytes()))
+                        simplejson.dumps({'messages': [msg]})).as_bytes())
                     request.finish()
                 else:
                     # the user isn't here, defer the message for them
