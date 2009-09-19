@@ -78,6 +78,7 @@ class CometHandler(BaseHandler):
         data = {
             'body': simplejson.loads(request.body),
             'headers': request.headers,
+            'arguments': request.arguments,
         }
         message_kind = 'comet-%s' % (request.method,)
         self.publish(Message(message_kind, datetime.now(), data))
