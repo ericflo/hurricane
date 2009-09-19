@@ -35,7 +35,7 @@ class CometHandler(BaseHandler):
         msg.update({
             'timestamp': json_timestamp(msg.pop('timestamp')),
         })
-        for_users = msg.pop('for')
+        for_users = msg.pop('for', None)
         if for_users is None:
             # this means send to all users
             sent_to = set()
