@@ -1,12 +1,14 @@
 $(function() {
+    document.cookie = 'sessionid=' + Math.uuid();
+    
     var nick = null;
-
+    
     function callback(data) {
         var msg = data.raw_data;
         $('.items').prepend('<li>' + msg.nick + ': ' + msg.message + '</li>');
     }
 
-    Hurricane.add_callback('comet', callback);
+    Hurricane.add_callback('comet-POST', callback);
 
     $('#chat-input').submit(function () {
         var data = $('#message').val();

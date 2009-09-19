@@ -4,6 +4,8 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 HANDLERS = (
     'hurricane.handlers.comet.CometHandler',
+    #'hurricane.handlers.printing.PrintingHandler',
+    'chat.handlers.chat.ChatHandler',
 )
 
 APPLICATION_MANAGER = 'hurricane.managers.ipc'
