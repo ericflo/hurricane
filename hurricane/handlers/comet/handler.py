@@ -88,3 +88,12 @@ class CometHandler(BaseHandler):
                 request.finish()
                 return
             self.requests[self.id_for_request(request)] = request
+    
+    def defer_messages(self, for_users, msg, seen_users=None):
+        pass
+    
+    def messages_for(self, user_id):
+        return []
+    
+    def id_for_request(self, request):
+        return None
