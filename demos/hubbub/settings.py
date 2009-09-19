@@ -94,8 +94,6 @@ INSTALLED_APPS = (
     
     'hurricane.django',
     
-    'django_cpserver',
-    
     'socialgraph',
     'messaging',
 )

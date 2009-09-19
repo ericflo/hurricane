@@ -1,2 +1,1 @@
-cherrypy
--e git://github.com/lincolnloop/django-cpserver.git#egg=django_cpserver
+
