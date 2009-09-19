@@ -1,4 +1,3 @@
-import collections
 from functools import wraps
 from itertools import islice
 
@@ -89,50 +88,6 @@ class HttpResponse(object):
         response += 'Content-Type: %s\r\n\r\n' % self.content_type
         response += self.body
         return response
-
-class RingBuffer(collections.deque):
-    """
-    inherits deque, pops the oldest data to make room for the newest data
-    when size is reached.
-
-    http://www.daniweb.com/forums/post202523-3.html
-    """
-    def __init__(self, size):
-        collections.deque.__init__(self)
-        self.size = size
-
-    def remove(self, item):
-        raise TypeError('you cannot remove an item from the ring buffer')
-
-    def __delitem__(self, x):
-        raise TypeError('you cannot slice or delete from the ring buffer')
-
-    def clear(self):
-        super(RingBuffer, self).clear()
-        self.append = type(self).append
-
-    def _full_append(self, item):
-        collections.deque.append(self, item)
-        # full, pop the oldest item, left most item
-        self.popleft()
-
-    def append(self, item):
-        collections.deque.append(self, item)
-        if len(self) == self.size:
-            self.append = self._full_append
-
-    def after_match(self, func, full_fallback=False):
-        """Returns an iterator for all the elements after the first
-        match.  If `full_fallback` is `True`, it will return all the
-        messages if the function never matched.
-        """
-        iterator = iter(self)
-        for item in iterator:
-            if func(item):
-                return iterator
-        if full_fallback:
-            iterator = iter(self)
-        return iterator
 
 def json_timestamp(dt):
     epoch = int(dt.strftime('%s'))

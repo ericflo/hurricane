@@ -1,4 +1,5 @@
 import Queue
+import uuid
 
 
 class Message(object):
@@ -6,12 +7,14 @@ class Message(object):
         self.kind = kind
         self.timestamp = timestamp
         self.raw_data = raw_data
+        self.uuid = str(uuid.uuid4())
 
     def _asdict(self):
         return {
             'kind': self.kind,
             'timestamp': self.timestamp,
-            'raw_data': self.raw_data
+            'raw_data': self.raw_data,
+            'uuid': self.uuid,
         }
     
     def __str__(self):

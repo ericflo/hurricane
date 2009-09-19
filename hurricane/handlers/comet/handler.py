@@ -19,21 +19,42 @@ GLOBAL_MEDIA_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'media')
 
 class CometHandler(BaseHandler):
     def initialize(self):
-        self.requests = Queue(0)
+        self.requests = {}
         self.server = HTTPServer(self.handle_request)
         self.server.listen(self.settings.COMET_PORT)
         self.thread = threading.Thread(target=IOLoop.instance().start).start()
-        self.messages = RingBuffer(self.settings.COMET_CACHE_SIZE)
         self.urls = self.get_urls()
 
     def receive(self, msg):
         msg = msg._asdict()
         msg.update({
-            'id': str(uuid.uuid4()),
             'timestamp': json_timestamp(msg.pop('timestamp')),
         })
-        self.messages.append(msg)
-        self.respond_to_requests()
+        for_users = msg.pop('for')
+        if for_users is None:
+            # this means send to all users
+            sent_to = set()
+            for request_id, request in self.requests.iteritems():
+                if request_id in sent_to:
+                    continue
+                sent_to.add(request_id)
+                request.write(HttpResponse(200, 'application/json', 
+                    simplejson.dumps({'messages': [msg]})))
+                request.finish()
+            # defer the message, but mark people that shouldn't be resent
+            self.defer_message(None, msg, seen_users=sent_to)
+        else:
+            # for_users is a list of user ids to send the message to, let's do 
+            # that now
+            for user in for_users:
+                if user in self.requests:
+                    request = self.requests[user]
+                    request.write(HttpResponse(200, 'application/json',
+                        simplejson.dumps({'messages': [msg]})))
+                    request.finish()
+                else:
+                    # the user isn't here, defer the message for them
+                    self.defer_message(user, msg)
 
     def get_urls(self):
         return (
@@ -59,28 +80,10 @@ class CometHandler(BaseHandler):
             request.write(HttpResponse(201).as_bytes())
             request.finish()
         else:
-            cursor = request.arguments.get('cursor', [None])[0]
-            if cursor == 'null' and len(self.messages) > 0:
-                self.respond_to_request(request)
-            else:
-                self.requests.put(request)
-
-    def respond_to_request(self, request):
-        cursor = request.arguments.get('cursor', [None])[0]
-        messages = list(self.messages.after_match(lambda x: x['id'] == cursor,
-                                                  full_fallback=True))
-        json = simplejson.dumps({'messages': messages})
-        response = HttpResponse(200, 'application/json', json)
-        try:
-            request.write(response.as_bytes())
-        except IOError:
-            return
-        request.finish()
-
-    def respond_to_requests(self):
-        while True:
-            try:
-                request = self.requests.get(block=False)
-            except Empty:
+            existing_message = self.messages_for(request)
+            if existing_messages:
+                request.write(HttpResponse(200, 'applicaiton/json', 
+                    simplejson.dumps({'messages': messages})))
+                request.finish()
                 return
-            self.respond_to_request(request)
+            self.requests[self.id_for_request(request)] = request

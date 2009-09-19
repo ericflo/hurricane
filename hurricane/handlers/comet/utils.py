@@ -1,5 +1,7 @@
-from simplejson import loads
 from Cookie import BaseCookie, Morsel, CookieError
+
+from simplejson import loads
+
 from hurricane.utils import cached_property
 
 _missing = object()
