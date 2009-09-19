@@ -1,9 +1,7 @@
 from datetime import datetime
 import threading
-import uuid
 
 import os
-from Queue import Queue, Empty
 
 import simplejson
 
@@ -12,12 +10,18 @@ from tornado.ioloop import IOLoop
 
 from hurricane.handlers.base import BaseHandler
 from hurricane.base import Message
-from hurricane.utils import RingBuffer, HttpResponse, json_timestamp
+from hurricane.utils import HttpResponse, json_timestamp
 from hurricane.handlers.comet import views
 
 GLOBAL_MEDIA_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'media')
 
 class CometHandler(BaseHandler):
+    """
+    The following methods can be overidden in subclasses:
+        * defer_message(for_users, msg, seen_users)
+        * messages_for
+        * id_for_request
+    """
     def initialize(self):
         self.requests = {}
         self.server = HTTPServer(self.handle_request)
@@ -69,9 +73,6 @@ class CometHandler(BaseHandler):
                 return view(request)
         request.write(HttpResponse(404).as_bytes())
         request.finish()
-        
-    ### THE BELOW HAVE A BAD ABSTRACTION
-    ### TODO: Fix the abstraction
 
     def comet_view(self, request):
         if request.method == 'POST':
@@ -80,10 +81,10 @@ class CometHandler(BaseHandler):
             request.write(HttpResponse(201).as_bytes())
             request.finish()
         else:
-            existing_message = self.messages_for(request)
+            existing_messages = self.messages_for(request)
             if existing_messages:
                 request.write(HttpResponse(200, 'applicaiton/json', 
-                    simplejson.dumps({'messages': messages})))
+                    simplejson.dumps({'messages': existing_messages})))
                 request.finish()
                 return
             self.requests[self.id_for_request(request)] = request
