@@ -1,4 +1,5 @@
 from datetime import datetime
+import Cookie # TODO: Swap this out for better cookie parsing
 import threading
 
 import os
@@ -18,8 +19,6 @@ GLOBAL_MEDIA_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'media')
 class CometHandler(BaseHandler):
     """
     The following methods can be overidden in subclasses:
-        * defer_message(for_users, msg, seen_users)
-        * messages_for
         * id_for_request
     """
     
@@ -35,31 +34,26 @@ class CometHandler(BaseHandler):
         msg.update({
             'timestamp': json_timestamp(msg.pop('timestamp')),
         })
-        for_users = msg.pop('for', None)
-        if for_users is None:
-            # this means send to all users
-            sent_to = set()
-            for request_id, request in self.requests.iteritems():
-                if request_id in sent_to:
+        if msg['kind'] == 'comet-response':
+            # If the message is a response provided by a dedicated handler,
+            # then we can assume a basic structure and use that to respond
+            to_ids = msg['raw_data'].pop('to_ids')
+            for session_key in to_ids:
+                if session_key not in self.requests:
                     continue
-                sent_to.add(request_id)
-                request.write(HttpResponse(200, 'application/json', 
-                    simplejson.dumps({'messages': [msg]})).as_bytes())
+                request = self.requests.pop(session_key)
+                request.write(HttpResponse(200, 'application/json',
+                    simplejson.dumps(msg)).as_bytes())
                 request.finish()
-            # defer the message, but mark people that shouldn't be resent
-            self.defer_message(None, msg, seen_users=sent_to)
         else:
-            # for_users is a list of user ids to send the message to, let's do 
-            # that now
-            for user in for_users:
-                if user in self.requests:
-                    request = self.requests[user]
-                    request.write(HttpResponse(200, 'application/json',
-                        simplejson.dumps({'messages': [msg]})).as_bytes())
-                    request.finish()
-                else:
-                    # the user isn't here, defer the message for them
-                    self.defer_message(user, msg)
+            # If we're listening to another message that gets sent, we have to
+            # assume that we should send it to everyone.
+            requests = self.requests
+            self.requests = []
+            for request in requests:
+                request.write(HttpResponse(200, 'application/json',
+                    simplejson.dumps(msg)).as_bytes())
+                request.finish()
 
     def get_urls(self):
         return (
@@ -76,25 +70,33 @@ class CometHandler(BaseHandler):
         request.finish()
 
     def comet_view(self, request):
+        """
+        This is dumb function, it just passes everything it gets into the
+        message stream.  Something else in the stream should be responsible
+        for asynchronously figuring out what to do with all these messages.
+        """
+        data = {
+            'body': simplejson.loads(request.body),
+            'headers': request.headers,
+        }
+        message_kind = 'comet-%s' % (request.method,)
+        self.publish(Message(message_kind, datetime.now(), data))
         if request.method == 'POST':
-            self.publish(Message('comet', datetime.now(),
-                simplejson.loads(request.body)))
             request.write(HttpResponse(201).as_bytes())
             request.finish()
         else:
-            existing_messages = self.messages_for(request)
-            if existing_messages:
-                request.write(HttpResponse(200, 'applicaiton/json', 
-                    simplejson.dumps({'messages': existing_messages})))
+            request_id = self.id_for_request(request)
+            if request_id:
+                self.requests[request_id] = request
+            else:
+                request.write(HttpResponse(200).as_bytes())
                 request.finish()
-                return
-            self.requests[self.id_for_request(request)] = request
-    
-    def defer_messages(self, for_users, msg, seen_users=None):
-        pass
-    
-    def messages_for(self, user_id):
-        return []
-    
+
     def id_for_request(self, request):
-        return None
+        session_id = ''
+        if 'Cookie' in request.headers:
+            cookies = Cookie.BaseCookie()
+            cookies.load(request.headers['Cookie'])
+            if 'sessionid' in cookies:
+                session_id = cookies['sessionid'].value
+        return session_id
