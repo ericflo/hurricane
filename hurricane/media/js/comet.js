@@ -10,7 +10,7 @@ var Hurricane = (function() {
     Hurricane.prototype = {
         on_success: function(response) {
             var messages = JSON.parse(response).messages;
-            this.cursor = messages[messages.length-1].id;
+            this.cursor = messages[messages.length-1].uuid;
             for (var msg_idx in messages) {
                 var msg = messages[msg_idx];
                 var callback = this.callbacks[msg.kind];

@@ -1,5 +1,4 @@
 from datetime import datetime
-import Cookie # TODO: Swap this out for better cookie parsing
 import threading
 
 import os
@@ -14,6 +13,7 @@ from hurricane.handlers.base import BaseHandler
 from hurricane.base import Message
 from hurricane.utils import RingBuffer, HttpResponse, json_timestamp
 from hurricane.handlers.comet import views
+from hurricane.handlers.comet.utils import parse_cookie
 
 GLOBAL_MEDIA_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'media')
 
@@ -22,6 +22,16 @@ class CometHandler(BaseHandler):
     The following methods can be overidden in subclasses:
         * id_for_request
     """
+    
+    def auto_subscribe(self, app_manager):
+        """
+        We override this method because we don't want to receive our own
+        messages.  To accomplish this, we add a conditional that prevents us
+        from subscribing to our own channel.
+        """
+        for handler in app_manager.handler_classes:
+            if handler.channel() != self.channel():
+                app_manager.subscribe(handler.channel(), self)
     
     def initialize(self):
         self.requests = {}
@@ -35,25 +45,26 @@ class CometHandler(BaseHandler):
         msg.update({
             'timestamp': json_timestamp(msg.pop('timestamp')),
         })
-        if msg['kind'] == 'comet-response':
+        to_ids = msg['raw_data'].pop('to_ids', None)
+        if msg['kind'] == 'comet-response' and to_ids:
             # If the message is a response provided by a dedicated handler,
-            # then we can assume a basic structure and use that to respond
-            to_ids = msg['raw_data'].pop('to_ids')
+            # then we can use the specific 'to_ids' parameter to decide who
+            # to send the message to.
             for session_key in to_ids:
                 if session_key not in self.requests:
                     continue
                 request = self.requests.pop(session_key)
                 request.write(HttpResponse(200, 'application/json',
-                    simplejson.dumps(msg)).as_bytes())
+                    simplejson.dumps(msg['raw_data'])).as_bytes())
                 request.finish()
         else:
             # If we're listening to another message that gets sent, we have to
             # assume that we should send it to everyone.
-            requests = self.requests
-            self.requests = []
+            requests = self.requests.values()
+            self.requests = {}
             for request in requests:
                 request.write(HttpResponse(200, 'application/json',
-                    simplejson.dumps(msg)).as_bytes())
+                    simplejson.dumps(msg['raw_data'])).as_bytes())
                 request.finish()
 
     def get_urls(self):
@@ -76,31 +87,33 @@ class CometHandler(BaseHandler):
         message stream.  Something else in the stream should be responsible
         for asynchronously figuring out what to do with all these messages.
         """
+        request_id = self.id_for_request(request)
+        if not request_id:
+            request.write(HttpResponse(403).as_bytes())
+            request.finish()
+            return
+        
         data = {
-            'body': simplejson.loads(request.body),
             'headers': request.headers,
             'arguments': request.arguments,
+            'remote_ip': request.remote_ip,
+            'request_id': request_id,
         }
         message_kind = 'comet-%s' % (request.method,)
-        self.publish(Message(message_kind, datetime.now(), data))
         if request.method == 'POST':
+            data['body'] = simplejson.loads(request.body)
             request.write(HttpResponse(201).as_bytes())
             request.finish()
         else:
-            request_id = self.id_for_request(request)
-            if request_id:
-                self.requests[request_id] = request
-            else:
-                request.write(HttpResponse(200).as_bytes())
-                request.finish()
+            self.requests[request_id] = request
+        self.publish(Message(message_kind, datetime.now(), data))
 
     def id_for_request(self, request):
         session_id = ''
         if 'Cookie' in request.headers:
-            cookies = Cookie.BaseCookie()
-            cookies.load(request.headers['Cookie'])
+            cookies = parse_cookie(request.headers['Cookie'])
             if 'sessionid' in cookies:
-                session_id = cookies['sessionid'].value
+                session_id = cookies['sessionid']
         return session_id
 
 class BroadcastCometHandler(CometHandler):
