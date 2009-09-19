@@ -4,7 +4,7 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 HANDLERS = (
     'spritzer.spritzer_handler.SpritzerHandler',
-    'hurricane.handlers.comet.CometHandler',
+    'hurricane.handlers.comet.BroadcastCometHandler',
 )
 
 APPLICATION_MANAGER = 'hurricane.managers.ipc'
