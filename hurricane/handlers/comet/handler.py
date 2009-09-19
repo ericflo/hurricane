@@ -145,7 +145,7 @@ class BroadcastCometHandler(CometHandler):
     
     def respond_to_request(self, request):
         cursor = request.arguments.get('cursor', [None])[0]
-        messages = list(self.messages.after_match(lambda x: x['id'] == cursor,
+        messages = list(self.messages.after_match(lambda x: x['uuid'] == cursor,
                                                   full_fallback=True))
         json = simplejson.dumps({'messages': messages})
         response = HttpResponse(200, 'application/json', json)
