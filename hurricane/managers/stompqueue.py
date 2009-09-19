@@ -8,7 +8,6 @@ try:
 except ImportError:
     import pickle
 
-from hurricane.base import Message
 from hurricane.managers import base
 
 # This is the reason that we can't name this manager module stomp, and have to
