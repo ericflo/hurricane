@@ -44,7 +44,7 @@ class CometHandler(BaseHandler):
                     continue
                 sent_to.add(request_id)
                 request.write(HttpResponse(200, 'application/json', 
-                    simplejson.dumps({'messages': [msg]})))
+                    simplejson.dumps({'messages': [msg]})).as_bytes())
                 request.finish()
             # defer the message, but mark people that shouldn't be resent
             self.defer_message(None, msg, seen_users=sent_to)
@@ -55,7 +55,7 @@ class CometHandler(BaseHandler):
                 if user in self.requests:
                     request = self.requests[user]
                     request.write(HttpResponse(200, 'application/json',
-                        simplejson.dumps({'messages': [msg]})))
+                        simplejson.dumps({'messages': [msg]})).as_bytes()))
                     request.finish()
                 else:
                     # the user isn't here, defer the message for them
