@@ -16,7 +16,6 @@ if settings.DEBUG:
     from django.contrib import admin
     ADMIN_PATH = os.path.join(os.path.dirname(admin.__file__), 'media')
     urlpatterns += patterns('',
-        (r'^comet', 'hubbub.views.proxy'),
         (r'^media/admin/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': ADMIN_PATH, 'show_indexes': True}),
         (r'^media/(?P<path>.*)$', 'django.views.static.serve',

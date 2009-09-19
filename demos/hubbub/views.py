@@ -18,16 +18,3 @@ def index(request):
     }
     return render_to_response('index.html', context,
         context_instance=RequestContext(request))
-
-# THIS IS A BAD IDEA, EVEN FOR DEV PROBABLY
-def proxy(request):
-    if request.method == 'POST':
-        url = settings.COMET_URL + request.path
-        data = request.raw_post_data
-    else:
-        url = settings.COMET_URL + request.get_full_path()
-        data = None
-    headers = {'Cookie': request.environ['HTTP_COOKIE']}
-    req = urllib2.Request(url, data, headers)
-    resp = urllib2.urlopen(req).read()
-    return HttpResponse(resp)

@@ -2,11 +2,10 @@ $(function() {
     
     var msg_form = $('#send-msg');
     /* Pretty sure you have to do this kind of crap for IE */
-    if(msg_form.length > 0) {
+    if (msg_form.length > 0) {
         msg_form.submit(function() {
             var msg = $('input[type="text"]', this).val();
             $.ajax({
-                url: '/comet/',
                 type: 'POST',
                 data: JSON.stringify({'msg': msg})
             });

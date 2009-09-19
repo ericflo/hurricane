@@ -2,7 +2,6 @@ var Hurricane = (function() {
     Hurricane = function() {        
         this.cursor = null;
         this.backoff = 500;
-        this.url = '/comet/';
         this.ajax_request();
         this.callbacks = {};
     };
@@ -34,7 +33,6 @@ var Hurricane = (function() {
             var args = $.param({'cursor': this.cursor});
             var hurricane = this;
             $.ajax({
-                url: this.url,
                 type: 'GET',
                 dataType: 'text',
                 data: args,
