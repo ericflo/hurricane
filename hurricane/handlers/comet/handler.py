@@ -22,6 +22,7 @@ class CometHandler(BaseHandler):
         * messages_for
         * id_for_request
     """
+    
     def initialize(self):
         self.requests = {}
         self.server = HTTPServer(self.handle_request)
