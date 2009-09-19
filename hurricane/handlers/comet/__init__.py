@@ -1,1 +1,1 @@
-from hurricane.handlers.comet.handler import CometHandler
+from hurricane.handlers.comet.handler import CometHandler, BroadcastCometHandler
