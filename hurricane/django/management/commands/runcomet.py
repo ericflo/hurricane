@@ -22,8 +22,9 @@ class Command(BaseCommand):
         ])
         Popen([
             sys.executable, 
-            os.path.join(os.path.dirname(__file__), '..', 'runner.py'),
-            '--settings=%' % settings.SETTINGS_MODULE
+            os.path.abspath(os.path.join(os.path.dirname(__file__),
+                '..', '..', '..', 'runner.py')),
+            '--settings=%s' % settings.SETTINGS_MODULE
         ])
         
         main_site = proxy.ReverseProxyResource('localhost', 8000, '')
