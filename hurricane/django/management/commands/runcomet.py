@@ -34,6 +34,7 @@ class Command(BaseCommand):
             sys.executable,
             sys.argv[0],
             'runserver',
+            '0.0.0.0:8080',
             '--settings=%s' % settings.SETTINGS_MODULE
         ])
         Process(target=start_proxy).start()
