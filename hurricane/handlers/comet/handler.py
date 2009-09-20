@@ -19,8 +19,7 @@ GLOBAL_MEDIA_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'media')
 
 class CometHandler(BaseHandler):
     """
-    The following methods can be overidden in subclasses:
-        * id_for_request
+    This is the basic class for writing comet applications.
     """
     
     def auto_subscribe(self, app_manager):
@@ -35,16 +34,20 @@ class CometHandler(BaseHandler):
     
     def initialize(self):
         self.requests = {}
+        self.pending_requests = self.requests
         self.server = HTTPServer(self.handle_request)
         self.server.listen(self.settings.COMET_PORT)
         self.thread = threading.Thread(target=IOLoop.instance().start).start()
         self.urls = self.get_urls()
+        self.post_init()
 
     def receive(self, msg):
         msg = msg._asdict()
         msg.update({
             'timestamp': json_timestamp(msg.pop('timestamp')),
         })
+        if not self.pre_comet_response(msg):
+            return
         to_ids = msg['raw_data'].pop('to_ids', None)
         if msg['kind'] == 'comet-response' and to_ids:
             # If the message is a response provided by a dedicated handler,
@@ -61,7 +64,7 @@ class CometHandler(BaseHandler):
             # If we're listening to another message that gets sent, we have to
             # assume that we should send it to everyone.
             requests = self.requests.values()
-            self.requests = {}
+            self.requests.clear()
             for request in requests:
                 request.write(HttpResponse(200, 'application/json',
                     simplejson.dumps(msg['raw_data'])).as_bytes())
@@ -105,7 +108,7 @@ class CometHandler(BaseHandler):
             request.write(HttpResponse(201).as_bytes())
             request.finish()
         else:
-            self.requests[request_id] = request
+            self.pending_requests[request_id] = request
         self.publish(Message(message_kind, datetime.now(), data))
 
     def id_for_request(self, request):
@@ -115,6 +118,27 @@ class CometHandler(BaseHandler):
             if 'sessionid' in cookies:
                 session_id = cookies['sessionid']
         return session_id
+    
+    def pre_comet_response(self, msg):
+        return True
+    
+    def post_init(self):
+        pass
+
+
+class UserAwareCometHandler(CometHandler):
+    def post_init(self):
+        self.pending_requests = {}
+
+    def pre_comet_response(self, msg):
+        if msg['kind'] == 'comet-user':
+            req = self.pending_requests.pop(msg['raw_data']['request_id'], None)
+            if not req:
+                return False
+            self.requests[msg['raw_data']['user_id']] = req
+            return False
+        return True
+
 
 class BroadcastCometHandler(CometHandler):
     """
