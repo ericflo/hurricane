@@ -135,6 +135,8 @@ class UserAwareCometHandler(CometHandler):
             req = self.pending_requests.pop(msg['raw_data']['request_id'], None)
             if not req:
                 return False
+            if not msg['raw_data']['user_id']:
+                return False
             self.requests[msg['raw_data']['user_id']] = req
             return False
         return True
