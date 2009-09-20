@@ -1,6 +1,6 @@
 var Hurricane = (function() {
     Hurricane = function() {        
-        this.cursor = BEGINNING_CURSOR || null;
+        this.cursor = window.BEGINNING_CURSOR || null;
         this.backoff = 500;
         this.url = '/comet/';
         this.ajax_request();
