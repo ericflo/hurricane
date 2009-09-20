@@ -30,11 +30,4 @@ class Command(BaseCommand):
             '--settings=%s' % settings.SETTINGS_MODULE
         ])
         Process(target=start_proxy).start()
-        #Popen([
-        #    sys.executable, 
-        #    os.path.abspath(os.path.join(os.path.dirname(__file__),
-        #        '..', '..', '..', 'runner.py')),
-        #    '--settings=%s' % settings.SETTINGS_MODULE
-        #])
-        
         main(settings)
