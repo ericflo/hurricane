@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 import threading
 
@@ -33,7 +34,7 @@ class CometHandler(BaseHandler):
                 app_manager.subscribe(handler.channel(), self)
     
     def initialize(self):
-        self.requests = {}
+        self.requests = defaultdict(lambda: [])
         self.pending_requests = self.requests
         self.server = HTTPServer(self.handle_request)
         self.server.listen(self.settings.COMET_PORT)
@@ -56,19 +57,21 @@ class CometHandler(BaseHandler):
             for session_key in to_ids:
                 if session_key not in self.requests:
                     continue
-                request = self.requests.pop(session_key)
-                request.write(HttpResponse(200, 'application/json',
-                    simplejson.dumps(msg['raw_data'])).as_bytes())
-                request.finish()
+                requests = self.requests.pop(session_key)
+                for request in requests:
+                    request.write(HttpResponse(200, 'application/json',
+                        simplejson.dumps(msg['raw_data'])).as_bytes())
+                    request.finish()
         else:
             # If we're listening to another message that gets sent, we have to
             # assume that we should send it to everyone.
             requests = self.requests.values()
             self.requests.clear()
-            for request in requests:
-                request.write(HttpResponse(200, 'application/json',
-                    simplejson.dumps(msg['raw_data'])).as_bytes())
-                request.finish()
+            for request_list in requests:
+                for request in request_list:
+                    request.write(HttpResponse(200, 'application/json',
+                        simplejson.dumps(msg['raw_data'])).as_bytes())
+                    request.finish()
 
     def get_urls(self):
         return (
@@ -108,7 +111,7 @@ class CometHandler(BaseHandler):
             request.write(HttpResponse(201).as_bytes())
             request.finish()
         else:
-            self.pending_requests[request_id] = request
+            self.pending_requests[request_id].append(request)
         self.publish(Message(message_kind, datetime.now(), data))
 
     def id_for_request(self, request):
@@ -128,16 +131,17 @@ class CometHandler(BaseHandler):
 
 class UserAwareCometHandler(CometHandler):
     def post_init(self):
-        self.pending_requests = {}
+        self.pending_requests = defaultdict(lambda: [])
 
     def pre_comet_response(self, msg):
         if msg['kind'] == 'comet-user':
-            req = self.pending_requests.pop(msg['raw_data']['request_id'], None)
-            if not req:
+            reqs = self.pending_requests.pop(msg['raw_data']['request_id'], [])
+            if not reqs:
                 return False
             if not msg['raw_data']['user_id']:
                 return False
-            self.requests[msg['raw_data']['user_id']] = req
+            for req in reqs:
+                self.requests[msg['raw_data']['user_id']].append(req)
             return False
         return True
 
