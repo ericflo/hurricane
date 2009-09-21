@@ -1,7 +1,6 @@
 import datetime
 
 from hurricane.handlers.base import BaseHandler
-from hurricane.handlers.comet import CometHandler
 
 from hurricane.base import Message
 from hurricane.utils import RingBuffer, json_timestamp

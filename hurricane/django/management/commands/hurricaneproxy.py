@@ -2,6 +2,7 @@ from twisted.internet import reactor
 from twisted.web import proxy, server
 from twisted.web.resource import Resource
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 class ProxyResource(Resource):

@@ -1,4 +1,3 @@
-import os
 from subprocess import Popen
 import sys
 from multiprocessing import Process

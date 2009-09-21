@@ -1,12 +1,8 @@
 import time
 import socket
+import pickle
 
 from collections import defaultdict
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
 
 from hurricane.managers import base
 
